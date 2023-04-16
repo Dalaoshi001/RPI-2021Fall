@@ -1,0 +1,204 @@
+
+Lecture 16
+-------------
+
+Announcements:
+-----------------
+
+Exam #2 next thursday
+
+
+Anonymous views
+
+SELECT baker, count(*) as numwins
+FROM results
+WHERE result = 'star baker'
+GROUP BY baker ;
+
+
+
+SELECT b.fullname, w.numwins ;
+FROM (SELECT baker, count(*) as numwins
+      FROM results
+      WHERE result = 'star baker'
+      GROUP BY baker) as w
+      , bakers b
+WHERE w.baker = b.baker      
+
+
+WITH wincounts AS
+    (SELECT baker, count(*) as numwins
+     FROM results
+     WHERE result = 'star baker'
+     GROUP BY baker
+     )
+SELECT b.fullname, w.numwins
+FROM bakers b, wincounts w
+WHERE b.baker = w.baker ;
+
+
+WITH wincounts AS
+    (SELECT baker, count(*) as numwins
+     FROM results
+     WHERE result = 'star baker'
+     GROUP BY baker
+     )
+SELECT f.baker
+FROM favorites f
+GROUP BY f.baker
+HAVING count(*) > (SELECT w.numwins
+                   FROM wincounts w
+		   WHERE w.baker = f.baker) ;
+
+
+WITH wincounts AS
+    (SELECT baker, count(*) as numwins
+     FROM results
+     WHERE result = 'star baker'
+     GROUP BY baker
+     ),
+     favcounts AS
+     (SELECT baker, count(*) as numfavs
+     FROM favorites
+     GROUP BY baker)
+SELECT
+    w.numwins+f.numfavs
+FROM
+    wincounts w, favcounts f
+WHERE
+    w.baker = f.baker;
+
+
+Building on relations that appear before is only possible in WITH
+(not in anonymous relations in FROM!)
+
+WITH wincounts AS
+    (SELECT baker, count(*) as numwins
+     FROM results
+     WHERE result = 'star baker'
+     GROUP BY baker
+     ),
+     favcounts AS
+     (SELECT baker, count(*)+w.numwins as numfavs
+     FROM favorites f, wincounts w
+     WHERE f.baker = w.baker
+     GROUP BY f.baker, w.numwins)
+SELECT *
+FROM favcounts ;
+
+
+VIEWS
+-----------
+
+A view is a query given a name!
+
+CREATE VIEW wincounts(baker, numwins) AS
+SELECT baker, count(*) as numwins
+FROM results
+WHERE result = 'star baker'
+GROUP BY baker ;
+
+
+SELECT b.fullname, w.numwins
+FROM bakers b, wincounts w
+WHERE b.baker = w.baker ;
+
+All views allow you to query tables. You can use them to define
+access control.
+
+Updatable views:
+------------------
+
+Only views with a single table (no joins) and no distinct/group
+by/aggregates are updatable. In views with no such constructs, there
+is a one to one correspondence between tuples in the view and the
+table.
+
+create view  olderthan40(baker, name, age) as
+select baker, fullname, age
+from bakers
+where age > 40
+with check option;
+
+update olderthan40 set name = 'Jon Jenkins II'
+where baker = 'Jon' ;
+
+update olderthan40 set age = 30
+where baker = 'Terry' ;
+
+insert into olderthan40 values('Sibel', 'Sibel Adali', 60) ;
+
+-----------
+Radio DB:
+
+create index sidx1 on songs(id,artistid) ;
+
+-----------
+
+Database server
+    Database
+    Schema    
+
+User
+    Role: groups of users or roles
+
+create user sibeltest password 'sibeltest' ;
+
+create role testeruser noinherit ;
+
+grant testeruser to sibeltest ;
+grant testeruser to sibeladali;
+
+create role activetester login inherit;
+
+grant activetester to sibeltest ;
+
+grant select on t1 to activetester ;
+
+grant select on t2 to testeruser ;
+
+inherit: inherits all privileges as soon as you login
+
+Grant: SELECT/INSERT/UPDATE/DELETE
+
+grant select on table to user/role ;
+
+grant connect on database xyz to user/role ;
+
+grant select on table to user/role  with grant option;
+
+--- user can now grant it to other users
+
+
+
+REVOKE
+-----------
+
+Revoke restrict - cannot delete the access right if it has been granted to others
+
+Revoke cascade - delete the access right and any rights granted as a result
+
+Revoke select on a from user1 ;
+
+Revoke select on a from user1 cascade ;
+
+
+
+-----------------
+
+Recursive query with WITH statement
+
+parents(parent,child)
+
+Ancestor:
+   1. if someone is a parent of child c, then they are the ancestor of child c
+   2. (a,p): a is an ancestor of b and (p,c) is a tuple in parents,
+      (a, c): a is an ancestor of c.
+
+WITH RECURSIVE anc AS (
+    SELECT parent, child from parents
+    UNION
+    SELECT a.parent, p.child
+    FROM anc a, parents p
+    WHERE a.child=p.parent)
+select * from anc ;

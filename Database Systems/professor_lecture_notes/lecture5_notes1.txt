@@ -1,0 +1,329 @@
+
+Lecture 5:
+-------------
+
+Normalization Theory
+---------------------
+
+Key: Given a relation R and fds F, a key is a set of attributes X
+such that:
+
+     (a) X+ includes all attributes in R (uniqueness)
+     (b) and no subset of X satisfies (a)  (minimality)
+
+
+SuperKey(superset of key): Given a relation R and fds F, a superkey
+is a set of attributes X such that:
+
+     (a) X+ includes all attributes in R (uniqueness)
+
+By definition, any key is a superkey.
+
+Prime Attribute: A prime attribute is an attribute in any key.
+
+
+Equivalence of functional dependencies: Given a set F of fds, F+ is
+the set of all functional dependencies I can obtain from F using all
+the inference rules.
+
+Two sets F1, and F2, are equivalent iff F1+ = F2+.
+
+Minimal Basis: A set of functional dependencies is said to be minimal
+if we cannot remove anything from them and still have the same closure!
+
+If a set F of fds is minimal, then we cannot:
+    - remove a functional dependency
+    - remove an attribute from the left or the right hand side of an f.d.
+without altering its meaning (i.e. its closure).
+
+Algorithm to compute a minimal basis:
+
+Input: a set F of fds
+
+
+F = {A->B, B->BC, ABC->D, B->D}
+
+1. First put the set of fds in a basis form using the decomposition rule
+
+F = {A->B, B->B, B->C, ABC->D, B->D}
+
+2. Remove all trivial fds
+
+F = {A->B, B->C, ABC->D, B->D}
+
+3. Suppose X->Y is in F and F'=F-{X->Y}.
+Compute X+ in F and F', if they are the same, then we can remove X->Y.
+
+F = {A->B, B->C, ABC->D, B->D}
+F' = {A->B, ABC->D, B->D}    --removed B->C
+
+In F, B+ = {B,C,D}
+In F', B+ = {B,D}, not the same, canot remove B->C
+
+F = {A->B, B->C, ABC->D, B->D}
+F' = {A->B, B->C, ABC->D}  -- removed B->D
+
+in F, B+ = {B,C,D}
+in F', B+ = {B,C}
+
+Cannot remove B->D
+
+F = {A->B, B->C, ABC->D, B->D}
+F' = {A->B, B->C, B->D}  -- removed ABC->D
+
+in F,  ABC+={A,B,C,D}
+in F', ABC+={A,B,C,D}
+Can remove ABC->D
+
+
+4. Suppose XZ->Y is in F.
+   Construct, F'= F - {XZ->Y} union {X->Y}
+   Check if X+ is the same in F and F', if so, then F' becomes F.
+
+F = {A->B, B->C, B->D}  -- done, because no extra attribute on the left
+
+5. Use combining rule to return a set of fds
+
+F = {A->B, B->CD}
+
+
+----------
+
+New example:
+
+F2 = {A->B, B->C, AB->D}
+F2' = {A->B, B->C, B->D}  -- removed A from AB->D
+
+in F, B+={B,C}
+in F', B+={B,C,D} -- cannot remove A
+
+F2 = {A->B, B->C, AB->D}
+F2' = {A->B, B->C, A->D}  -- removed B from AB->D
+
+in F, A+={A,B,C,D}
+in F', A+={A,B,C,D}  -- Yes, can remove B
+
+Final:
+F2 = {A->B, B->C, A->D}
+F2 = {A->BD, B->C}
+
+----------
+
+R(A,B,C,D,E,F,G)
+
+F = { AB->C, BD->BEF, CDF->AG, ABC->G, ABC->D }
+
+Step 1:
+
+F = { AB->C, BD->B, BD->E, BD->F, CDF->G, CDF->A, ABC->G, ABC->D }
+
+Step 2:
+
+F = { AB->C, BD->B, BD->E, BD->F, CDF->G, CDF->A, ABC->G, ABC->D }
+F = { AB->C, BD->E, BD->F, CDF->G, CDF->A, ABC->G, ABC->D }
+
+Step 3:
+
+F = { AB->C, BD->E, BD->F, CDF->G, CDF->A, ABC->G, ABC->D }
+F' = { AB->C, BD->E, BD->F, CDF->G, CDF->A, ABC->D } -- remove ABC->G
+
+in F, ABC+ = {A,B,C,D,E,F,G}
+in F', ABC+ = {A,B,C,D,E,F,G}
+
+Step 4:
+
+F = { AB->C, BD->E, BD->F, CDF->G, CDF->A, ABC->D } 
+F' = { AB->C, BD->E, BD->F, CDF->G, CDF->A, AB->D }   == changed ABC->D to AB->D
+
+in F, AB+ = {A,B,C,D,E,F,G}
+in F', AB+ = {A,B,C,D,E,F,G}
+
+Step 5:
+
+F = { AB->CD, BD->EF, CDF->AG }
+This is a minimal set.
+
+--------------
+Decomposition:
+
+Given a relation R and a set F of fds, a decomposition is given by
+R1(X), R2(Y), ... where X,Y are sets of attributes of R, computed by:
+
+R1 = project_{X} R
+R2 = project_{Y} R
+...
+
+such that X union Y union ... make up all the attributes in R.
+
+------
+
+Lossless Decomposition:
+
+Given R and F, a decomposition R1, R2, ...,Rn is lossless if it is guaranteed
+that
+
+R1 * R2 * ... * Rn = R
+
+i.e. the natural join is guaranteed to return the same results as the
+original relation.
+
+All decompositions must be lossless!
+
+Algorithm to check if a decomposition is lossless
+----------------------------------------------------
+Given R and F, a decomposition R1, R2, ...,Rn construct a relation R
+such that
+
+For each decomposed relation, there is a tuple in R where attributes in
+Ri has no subscripts (known values) and the rest with a new subscript for
+each tuple (unknown values)
+
+Apply functional dependencies like X-Y, if two tuples have the same
+values for X, then make Y values the same (if the value for one tuple
+is known, make the other known, otherwise make them the same unknown
+value)
+
+Continue until no rules can be applied.
+
+If in the resulting relation, there is a tuple with no subscript, then the
+decomposition is lossless.
+
+If in the resulting relation, there is NO tuple with no subscript, then the
+decomposition is lossy and the resulting relation is a counter example.
+
+R(A,B,C,D,E)   F = {AB->C, B->D, C->E}
+R1(A,B,C)  R2(A,B,E)   R3(D,E)
+
+     A  B  C  D  E
+     a  b  c  d1 e1
+     a  b  c2 d2 e
+     a3 b3 c3 d  e
+
+Apply AB->C
+
+     A  B  C  D  E
+     a  b  c  d1 e1
+     a  b  c  d2 e
+     a3 b3 c3 d  e
+
+Apply C->E
+
+     A  B  C  D  E
+     a  b  c  d1 e
+     a  b  c  d2 e
+     a3 b3 c3 d  e
+      
+Apply B->D
+
+     A  B  C  D  E
+     a  b  c  d1 e
+     a  b  c  d1 e
+     a3 b3 c3 d  e
+
+Lossy decomposition! No tuple with no subscripts.
+
+-----------
+
+R(A,B,C) F={A->B}
+
+R1(A,C), R2(B,C)
+
+    A   B   C
+    a   b1  c
+    a2  b   c
+
+Can't apply any of the rules! Lossy
+
+R3(A,B), R4(A,C)
+
+    A   B   C
+    a   b   c1 
+    a   b2  c
+
+Apply A->B
+
+    A   B   C
+    a   b   c1 
+    a   b   c  <-- no subscript, lossless decomposition
+
+-------------
+Projection of functional dependencies to a decomposition
+
+Given a relation R and a set F of fds and a decomposed relation
+R1. The projection of F into R1 is the set of all functional
+dependencies in F+ that only contain the attributes of R1.
+
+R(A,B,C,D,E,F,G)   F = {AB->CD, BD->EF, CDF->AG }
+
+R1(A,B,D,G) F1 = {AB->DG}
+
+AB+ = {A,B,C,D,E,F,G}
+
+AB -> ABDG
+simplify to find minimal basis
+
+AB -> DG
+
+R2(A,B,C,E,F)  F2 = {AB->CEF}
+
+AB->CEF
+
+
+F1 union F2 = {AB->CDEFG}, not equivalent to F
+    CDF+ = {C,D,F}
+
+F = {AB->CD, BD->EF, CDF->AG }
+    CDF+ = {C,D,F,A,G}
+    
+-------------
+
+S(A,B,C)   F = {A->B, B->C}
+
+S1(A,B)     F1 = {A->B}
+S2(B,C)     F2 = {B->C}
+
+Then, F1 union F2 = {A->B, B->C}, is equal to F.
+
+This decomposition is dependency preserving!
+
+
+Dependency Preserving Decompositions
+--------------------------------------
+Given a relation R and a set F of fds., and a decomposition R1, R2,...,Rn
+
+and suppose F1, F2, ... Fn, are the projection of F onto R1, R2, .. Rn
+respectively.
+
+If F1 union F2 union .... Fn equivalent to F, then we say that this is
+a dependency preserving decomposition.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Showname, Startyear, Creator, StreamSite, URL, ShowSeasons, StreamSeasons
+
+Showname -> StartYear, Creator, ShowSeasons  (assuming a single creator)
+StreamSite -> URL
+Showname StreamSite -> StreamSeasons
+URL -> StreamSite
+Showname URL -> StreamSeasons
+
+
+
+Student(RIN, SSN, FirstName, LastName, Email, Major, Advisor)
+
+RIN->SSN, FirstName, LastName, Email
+SSN->RUN
+RIN, Major -> Advisor
+
+
+----------

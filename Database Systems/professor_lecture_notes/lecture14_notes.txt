@@ -1,0 +1,142 @@
+
+Lecture 14
+-------------------
+
+Oh yes, apparently there is a way to solve Query 8 in a fast
+way despite what I said!
+
+----------------
+
+
+Transactions -> Atomicity
+
+
+drop table t3;
+drop table t2;
+drop table t1;
+
+create table t1(
+       id1 int primary key
+       , name varchar(10)
+) ;
+
+create table t2(
+       id2 int primary key
+       , id1 int
+       , name varchar(10)
+       ,  foreign key (id1) references t1(id1)
+          on delete cascade
+	  on update set null
+) ;
+
+create table t3(
+       id3 int primary key
+       , id1 int
+       , id2 int not null
+       , foreign key (id1) references t1(id1)
+         on delete set null
+	 on update cascade
+       , foreign key (id2) references t2(id2)
+         on delete cascade
+	 on update cascade
+) ;
+
+
+insert into t1 values(1,'a');
+insert into t1 values(2,'b');
+insert into t1 values(3,'c');
+insert into t1 values(4,'d');
+insert into t2 values(1,1,'r');
+insert into t2 values(2,1,'s');
+insert into t2 values(3,4,'t');
+insert into t2 values(4,2,'v');
+insert into t2 values(5,null,'w');
+insert into t3 values(1,2,3);
+insert into t3 values(2,2,3);
+insert into t3 values(3,null,4);
+insert into t3 values(4,4,2);
+insert into t3 values(5,4,1);
+
+Tuple level constraints:
+
+create table t4(
+       id4 int primary key
+       , id1 int
+       , name varchar(10) not null
+       , a int  check( a <1000 and a>100 )
+       , b int
+       , c int
+       , d int
+       ,  foreign key (id1) references t1(id1)
+          on delete cascade
+	  on update set null
+       , unique(a,b) -- table level uniqueness
+       , check (c is not null or d is not null) --tuple level
+) ;
+
+
+Constraint checking is deferred
+
+
+Table or database level constraints:
+---------------------------------------
+
+There should be no zero users in the database.
+
+create assertion nozerousers (
+   check (select count(*) from users) > 0  
+) ;
+
+
+
+----------
+
+Dirty value: A value that is changed by an uncommitted transaction
+
+BEGIN ;   -- BEGIN TRANSACTION
+SET ISOLATION LEVEL XXX
+
+
+Isolation levels:
+
+READ UNCOMMITTED;   ---xacts cannot change tuples
+
+READ COMMITTED ;
+
+REPEATABLE READ ;  -- read committed + repetable
+
+SERIALIZABLE ;     -- read committed + repetable + no phantom updates
+
+-------------------------
+
+TABLE T1(X,Y,Z)
+
+Procedural Programming
+
+
+For each X, return the 2 Y values with highest total Z
+
+
+  loop
+     SELECT X, Y, sum(Z) as Val
+     FROM T1
+     GROUP BY X,Y
+     ORDER BY X, Y, val ;
+
+     choose the top two Y for each X.
+
+
+Basic constructs to add DB functionality:
+
+Create a connection to a DB server
+
+Run a query or update/insert/delete operation
+     -> feed programming variables into the program
+
+Loop through all the results of query
+     -> read returned values into program variables
+
+Close a connection/query results
+
+Check errors
+

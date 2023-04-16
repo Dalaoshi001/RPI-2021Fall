@@ -1,0 +1,22 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+Add time check function to avoid use's invalid input or some url injection attack
+in order to make sure our program won't generate invalid data into the database.
+Utilize redis to do cache in order to speed up some checks operation. Finally
+finish most of functions in appointment, buildings, and rooms.
+
+Next week:
+Plan to modify our strucutre and add comments, even decide to modify our 
+database and systems to improve the efficiency.
+
+Block:
+There is currently no block there.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/074131a68c826af6b185447d558a46833923affd
+https://github.com/ACertainScientific/MeetUp/commit/c20127b5af25260e63e1b77b7861f68429aa16e9
+https://github.com/ACertainScientific/MeetUp/commit/ef087dd7edb41172a239176230a8e9e6ee2bdacb
+https://github.com/ACertainScientific/MeetUp/commit/eee7521a580be77992dcfd3a581928c4d1f1b5ae

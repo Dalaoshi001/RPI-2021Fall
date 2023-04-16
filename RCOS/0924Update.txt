@@ -1,0 +1,26 @@
+Yihang Wang
+Status Update1
+Project Meetup
+
+This Week:
+Study Springboot in bilibili, help modify structure of database.
+For database, we took long time to make sure its in BCNF structure.
+We decide to utilize mysql and setup the configuration in springboot
+backend. Test and make sure our configuration in springboot can work
+successfully by using postman to run. I keep communication with my project
+manager. We have many conversions and after conversation, we decide to utilize
+two sepearate repos for front-end and back-end. For studying springboot, I know
+the basic concepts about component, autowired, basic web requests and even the
+auto configration function in springboot. I will keep continuing study in this when
+I doing my work.
+
+Next Week:
+Continuing studying springboot, especailly for database, add, delete, update and select
+four basic operations. And we may modify our database in the future.  I also plan to keep
+communication with front-end to know their basic requirments for back-end API.
+
+Block:
+There is no currently block right now!!
+
+Link:
+https://github.com/ACertainScientific/MeetUp/commit/f8819c4860271523898d4af320993b34613adbc9

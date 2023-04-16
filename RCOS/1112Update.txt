@@ -1,0 +1,24 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+Write an interface which will generate qrcode with given URL. Also,
+comment many codes to make it clear for front-end team. Trying
+to add more data to test to make sure our code works well in the
+database. Try to solve the problem with token, headers and even
+domain name.
+
+Next week:
+Keep communication with the front-end team. Continue studying
+springboot. Actually, I belive our back-end team's work is almost
+done!
+
+Block:
+There is currently no block there.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/b6da16b8f1bc927dbda4937368ccaea30031e9c2
+https://github.com/ACertainScientific/MeetUp/commit/04a7b96f4854dd72aa821a05257389513f8fc590
+https://github.com/ACertainScientific/MeetUp/commit/f08582ee1463182b9ae424f6bb14e2c97a046d85
+https://github.com/ACertainScientific/MeetUp/commit/13cb7ac385e7e2ae63502aa6dd35d7c8d238a08f

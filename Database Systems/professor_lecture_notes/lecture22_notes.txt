@@ -1,0 +1,23 @@
+
+Query Processing
+------------------
+
+Multi-pass operations
+-----------------------
+
+Block Nested Loop Join
+
+M blocks of memory
+
+
+External Sort
+---------------
+
+Sort -> Distinct
+        Group BY
+
+
+
+SELECT R.D, S.E
+FROM R, S
+WHERE R.A = S.B and R.C = 400

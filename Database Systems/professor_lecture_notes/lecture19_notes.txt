@@ -1,0 +1,170 @@
+
+Today on databases:
+
+     Disks and why we love them ....
+     New lecture exercise
+     No hw assigned yet.
+
+
+Disk are much slower than memory
+Cost of a query: #disk pages read (and written)
+
+RAID (Redundant Arrays of Inexpensive Disks)
+
+1. Speed of read/write
+2. Fault tolerance
+
+RAID - 0
+
+(4 disks, distribute the data to multiple disks)
+
+D1  p1  p5  p9   p13
+D2  p2  p6  p10  p14
+D3  p3  p7  p11  p15
+D4  p4  p8  p12  p16
+
+Reads/writes faster
+No redundancy
+
+RAID - 1
+
+D1  p1  p3  p5   p7
+D2  p2  p4  p6  p8
+D3  p1  p3  p5   p7
+D4  p2  p4  p6  p8
+
+Reads are fast (though not as fast as RAID-0), writes are slower than
+RAID-0.
+
+If any disk goes down, no data loss and can continue to operate
+without a slow down.
+
+RAID - 4
+
+D1  p1  p5  p9   p13
+D2  p2  p6  p10  p14
+D3  p3  p7  p11  p15
+D4  p4  p8  p12  p16
+
+D5  p1-4' p5-8' p9-12' p13-16'
+
+p1-4' is the parity of page p1, p2, p3 and p4
+
+p1   01010101010
+p2   10100010110
+p3   01010110100
+p4   10100010110
+
+p'   00000011110 (exor)
+
+p3    01010110100
+p3new 01010110111
+
+p'new 00000011101
+
+Reads are much faster, writes are slower (every write to disks
+1-4 requires a change to parity disk), parity disk is a bottleneck
+
+RAID-4 does not loose any data for 1 disk failure
+
+
+p1   01010101010
+p3   01010110100
+p4   10100010110
+
+p'   00000011110 (exor)
+
+It is possible to construct the lost disk from the others, but
+this operation is slow (the RAID is degraded!)
+
+p2   101....
+
+
+RAID-5
+
+Stripe the parity disk
+
+D1  p1    p6     p11      p16      p17-20'
+D2  p2    p7     p12      p13-16'  p17
+D3  p3    p8     p9-12'   p13      p18
+D4  p4    p5-8'  p9       p14      p19
+D5  p1-4' p5     p10      p15      p20
+
+
+Reads are still fast, writes are faster than RAID-4
+and still can recover from 1 failure.
+
+
+
+
+B-trees
+------------
+
+An index page stores: some header info, key values (indexed
+attribute/attributes) and a pointer to a disk page
+
+For example: a disk page 8KB,
+suppose you index an integer (4B)
+and a disk page address is 12B
+
+Each entry is is 16B (12+4)
+The capacity of a single page is: 8*1024/16 (disregarding the header)
+ -> Order fo the B-tree (n value)
+
+Given a B-Tree of order n:
+---------------
+
+1. Each node of a B-tree is a disk page
+
+2. Each node can store at most n key values (n+1 pointers) and at
+least n/2 values (each node is at least half full, with the exception
+of root)
+
+3. A leaf node will store key values and pointers to tuples in the
+relation
+
+A leaf node can address at most n tuples and has n+1 pointers
+(1 pointer to the next leaf node in the B-tree)
+
+
+4. Internal nodes point to index nodes at the level below.
+   An internal node can have at most n key values and n+1 pointers
+
+5. Root can have anywhere between 2 to n+1 pointers (1 to n key values)
+
+Estimate the size of a B-tree:
+--------------------------------
+
+A B-tree on R(A,B) where each node can store at most 200 entries (key+pointer)
+ (min 100, except for root)
+
+What is the size of the B-tree for a relation with 10 million tuples
+
+Leaf level: 10000000/200 = 50,000 nodes at the leaf level
+
+Next internal level:  50,000/200 = 250 nodes 
+
+Next internal level:  250/200 = 2 nodes
+
+Next level: 1 node (root)
+
+number of levels is log_n(number of tuples)
+
+
+What is every node was half full?
+
+Leaf level: 10000000/100 = 100,000 nodes at the leaf level
+
+Next internal level:  100,000/100 = 1,000 nodes 
+
+Next internal level:  1000/100 = 10 nodes
+
+Next level: 1 node (root)
+
+
+Insertion/Deletion
+
+Insert: search for the value
+if there is space, insert
+else: create a new node, distribute the values and insert a
+      pointer to the new recursively at the parent

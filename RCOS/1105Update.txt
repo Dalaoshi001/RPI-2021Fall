@@ -1,0 +1,22 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+Working on setting up the whole environment, try to get connection between backend and frontend.
+Since my redis has been collapsed, still trying reinstall my redis. Also, Write serveal comments to my code
+to make them more readable. Keep studying springboot's relevant configuration. Finish writing python
+to make more convenient for teammates to get the link from git.
+
+Next week:
+Continue studying Springboot's relevant configuration and trying to install stable version of redis. Maybe
+write more comments in my code and prepare for the final presentation.
+
+Block:
+There is currently no block there.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/28500fc3da9b625ad2f015c957ec153d8bb8d2d9
+https://github.com/ACertainScientific/MeetUp/commit/3d5f9eba21d758786eb5a1d6ff0b0b399274c387
+https://github.com/ACertainScientific/MeetUp/commit/d3b237773f0da42da4ec03925cfb98e7ab597a92
+https://github.com/ACertainScientific/MeetUp/commit/d2d25c9b5fbbac363e534006981bae0668fc907b

@@ -1,0 +1,64 @@
+INNER JOIN vs OUTER JOIN
+-------------------------------
+
+Inner join
+
+Select 
+  b.baker,
+  b.fullname,
+  count(*) as numtimes
+FROM
+  favorites f
+  inner join bakers b
+  on f.baker = b.baker
+GROUP BY
+  b.baker;
+
+
+Left join
+
+SELECT
+  b.baker
+  , b.fullname
+  , count(f.episodeid) as numtimes
+FROM
+  bakers b
+  left outer join favorites f
+  on f.baker = b.baker
+GROUP BY
+  b.baker;
+
+
+
+SELECT baker FROM bakers
+EXCEPT
+SELECT  baker FROM favorites;
+
+
+SELECT 
+  b.baker
+  , b.fullname
+FROM
+  bakers b
+  left outer join favorites f
+  on f.baker = b.baker
+WHERE
+  f.baker is null;
+
+
+
+SELECT DISTINCT
+  b.baker
+  , b.fullname
+FROM
+  bakers b
+  left join results r
+  on b.baker = r.baker and r.result = 'star baker'
+WHERE
+  r.result = 'star baker'
+GROUP BY
+  b.baker
+;
+
+
+

@@ -1,0 +1,111 @@
+
+Exam:
+--------
+
+On monday!
+
+
+Important:
+-----------------
+
+Please whitelist the following email: rpidbsprof@gmail.com
+
+Instructions are here:
+
+https://itssc.rpi.edu/hc/en-us/articles/360010480672-Anti-Spam-Services-Respite-FAQ
+
+I will send your username/password for the class db server from this
+address.
+
+SQL
+--------
+
+SQL is an industry standard
+
+- Query language  - select from where
+
+- Data manipulation language  - create/drop/....
+       insert/update/delete tuples
+
+- Case insensitive
+
+- Strings are delimited by ''
+
+- Each statemnt ends with ;
+
+- Comments are in --
+
+- SQL is bag based, not set based
+
+- Relations may not have any primary keys
+
+- Use DISTINCT if copies may be returned but not wanted
+
+--
+
+SELECT
+   attributes
+FROM
+   relation
+WHERE
+   boolean conditions
+;   
+
+
+select
+   id
+   , title
+   , viewers7day
+   , firstaired
+from
+   episodes
+where
+   viewers7day >9.2
+   and firstaired > date '2018-09-25'
+;
+
+Regular expressions:
+-----------------------
+
+%  zero or more characters
+_  one character only
+
+ select * from showstoppers where make like '%''%';
+
+NULL Values
+------------
+
+There is no value for an attribute because:
+
+- No value exists
+- I don't know the value
+- I don't know whether there is a value or not
+
+select * from cuteanimals where name is null;
+
+3 = 4     false
+3 = 3     true
+3 = null  unknown
+
+
+unknown and false  = false
+unknown and true   = unknown
+
+unknown or false   = unknown
+unknown or true    = true
+
+not unknown        = unknown
+
+select
+   id
+   , title
+from
+   episodes
+where
+   firstaired < date '2018-09-21';
+
+date - date -> interval
+date + interval -> date
+date + time -> timestamp
+timestamp + interval -> timestamp
+time + interval -> time

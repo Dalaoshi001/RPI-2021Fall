@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="robots" content="noindex">
+<title>SQL command - Adminer</title>
+<link rel="stylesheet" type="text/css" href="../adminer/static/default.css">
+<script src='../adminer/static/functions.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script src='static/editing.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<link rel="stylesheet" type="text/css" href="../externals/jush/jush.css">
+<link rel="shortcut icon" type="image/x-icon" href="../adminer/static/favicon.ico">
+<link rel="apple-touch-icon" href="../adminer/static/favicon.ico">
+
+<body class="ltr nojs">
+<script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">
+mixin(document.body, {onkeydown: bodyKeydown, onclick: bodyClick});
+document.body.className = document.body.className.replace(/ nojs/, ' js');
+var offlineMessage = 'You are offline.';
+var thousandsSeparator = ',';
+</script>
+
+<div id="help" class="jush-pgsql jsonly hidden"></div>
+<script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">mixin(qs('#help'), {onmouseover: function () { helpOpen = 1; }, onmouseout: helpMouseout});</script>
+
+<div id="content">
+<p id="breadcrumb"><a href="?pgsql=">PostgreSQL</a> &raquo; <a href='?pgsql=&amp;username=wangy58' accesskey='1' title='Alt+Shift+1'>Server</a> &raquo; <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=">db_wangy58</a> &raquo; <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public">public</a> &raquo; SQL command
+<h2>SQL command</h2>
+<div id='ajaxstatus' class='jsonly hidden'></div>
+<pre id='sql-1'><code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float)</code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.007 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=DROP+FUNCTION+IF+EXISTS+recommendation%28time%2Ctime%2Cvarchar%2Cint%2Cfloat%2Cfloat%2Cfloat%29'>Edit</a>
+<pre id='sql-2'><code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation_helper(time,time,varchar,int,float,float,float)</code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.001 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=DROP+FUNCTION+IF+EXISTS+recommendation_helper%28time%2Ctime%2Cvarchar%2Cint%2Cfloat%2Cfloat%2Cfloat%29'>Edit</a>
+<pre id='sql-3'><code class='jush-pgsql'>CREATE OR REPLACE FUNCTION
+    recommendation_helper(fromtime time
+               , totime time
+               , inputstation varchar
+               , topk int
+	       , w1 float, w2 float, w3 float) RETURNS VARCHAR AS $$
+BEGIN
+   RETURN &#039;Inputs: &#039;||fromtime::varchar(5)||&#039; &#039;||totime::varchar(5)||&#039; / &#039;||inputstation||&#039; / &#039;||topk::varchar||&#039; / &#039;||w1::varchar||&#039; &#039;||w2::varchar||&#039; &#039;||w3::varchar ;
+END ;
+$$ LANGUAGE plpgsql</code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.006 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=CREATE+OR+REPLACE+FUNCTION%0D%0A++++recommendation_helper%28fromtime+time%0D%0A+++++++++++++++%2C+totime+time%0D%0A+++++++++++++++%2C+inputstation+varchar%0D%0A+++++++++++++++%2C+topk+int%0D%0A%09+++++++%2C+w1+float%2C+w2+float%2C+w3+float%29+RETURNS+VARCHAR+AS+%24%24%0D%0ABEGIN%0D%0A+++RETURN+%27Inputs%3A+%27%7C%7Cfromtime%3A%3Avarchar%285%29%7C%7C%27+%27%7C%7Ctotime%3A%3Avarchar%285%29%7C%7C%27+%2F+%27%7C%7Cinputstation%7C%7C%27+%2F+%27%7C%7Ctopk%3A%3Avarchar%7C%7C%27+%2F+%27%7C%7Cw1%3A%3Avarchar%7C%7C%27+%27%7C%7Cw2%3A%3Avarchar%7C%7C%27+%27%7C%7Cw3%3A%3Avarchar+%3B%0D%0AEND+%3B%0D%0A%24%24+LANGUAGE+plpgsql'>Edit</a>
+<pre id='sql-4'><code class='jush-pgsql'>DROP TABLE IF EXISTS songsimilarity</code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.006 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=DROP+TABLE+IF+EXISTS+songsimilarity'>Edit</a>
+<pre id='sql-5'><code class='jush-pgsql'>CREATE TABLE songsimilarity(
+    songid       int
+    , songname   text
+    , artistname text
+    , songscore  float
+)</code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.011 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=CREATE+TABLE+songsimilarity%28%0D%0A++++songid+++++++int%0D%0A++++%2C+songname+++text%0D%0A++++%2C+artistname+text%0D%0A++++%2C+songscore++float%0D%0A%29'>Edit</a>
+<pre id='sql-6'><code class='jush-pgsql'>CREATE OR REPLACE FUNCTION
+    recommendation(fromtime time
+               , totime time
+               , inputstation varchar
+               , topk int
+	       , w1 float, w2 float, w3 float)
+    RETURNS SETOF songsimilarity AS $recommendation$
+DECLARE
+   myrow songsimilarity%rowtype ;
+BEGIN
+
+    --  The function to get the corresponding songid within the time period and in that station
+    DROP TABLE IF EXISTS songsplayed;
+    CREATE TABLE songsplayed AS
+    SELECT DISTINCT p.songid as songid
+    FROM playedonradio p
+    WHERE p.station = inputstation and p.playedtime::TIME &gt;= fromtime AND p.playedtime::TIME &lt;= totime;
+
+
+    -- Write to the table get all songs except previous ones
+    DROP TABLE IF EXISTS songsnosuchtime;
+    CREATE TABLE songsnosuchtime AS
+    SELECT DISTINCT s.id as songid FROM songs s
+    EXCEPT SELECT DISTINCT ss.songid FROM songsplayed ss;
+
+
+    -- The function which is to calcualte the gs score
+
+   CREATE OR REPLACE FUNCTION gs(reali<i>…</i></code></pre>
+<p class='message' title=''>Query executed OK, 0 rows affected. <span class='time'>(0.006 s)</span>
+<pre id='sql-7'><code class='jush-pgsql'>select * from recommendation(time &#039;08:00&#039;,time &#039;10:00&#039;, &#039;mai&#039;, 10,1,0,0)</code></pre>
+<div class='scrollable'>
+<table cellspacing='0' class='nowrap'>
+<thead><tr><th>songid<th>songname<th>artistname<th>songscore</thead>
+<tr><td>63674<td>Undecided<td>Chris Brown<td>49<tr class="odd"><td>6304<td>Be Careful<td>Cardi B<td>46<tr><td>8008<td>Bodak Yellow<td>Cardi B<td>46<tr class="odd"><td>39344<td>Money<td>Cardi B<td>46<tr><td>15065<td>Don&#039;t<td>Bryson Tiller<td>41<tr class="odd"><td>12067<td>Controlla<td>Drake<td>40<tr><td>21868<td>God&#039;s Plan<td>Drake<td>40<tr class="odd"><td>22074<td>Good As Hell<td>Lizzo<td>40<tr><td>29595<td>In My Feelings<td>Drake<td>40<tr class="odd"><td>31524<td>Juice<td>Lizzo<td>40<tr><td>42251<td>Nonstop<td>Drake<td>40<tr class="odd"><td>62978<td>Truth Hurts<td>Lizzo<td>40<tr><td>6102<td>Barbie Dreams<td>Nicki Minaj<td>39<tr class="odd"><td>11036<td>Chun-Li<td>Nicki Minaj<td>39<tr><td>34228<td>Let You Love Me<td>Rita Ora<td>39<tr class="odd"><td>34690<td>Lights Down Low<td>MAX<td>39<tr><td>38933<td>Mine<td>Bazzi<td>39<tr class="odd"><td>44769<td>Paradise<td>Bazzi<td>39<tr><td>54826<td>Starships<td>Nicki Minaj<td>39<tr class="odd"><td>69638<td>Your Song<td>Rita Ora<td>39<tr><td>46661<td>Promiscuous<td>Nelly Furtado<td>38<tr class="odd"><td>854<td>5200<td>ScHoolboy Q<td>35<tr><td>14619<td>Disturbia<td>Rihanna<td>35<tr class="odd"><td>42579<td>Numb Numb Juice<td>ScHoolboy Q<td>35<tr><td>26881<td>I Gotta Feeling<td>Black Eyed Peas<td>34<tr class="odd"><td>40446<td>My House<td>Flo Rida<td>34<tr><td>49668<td>Run Up (feat. PARTYNEXTDOOR &amp; Nicki Minaj)<td>Major Lazer<td>34<tr class="odd"><td>57186<td>Taki Taki (feat. Selena Gomez, Ozuna &amp; Cardi B)<td>DJ Snake<td>34<tr><td>8405<td>Bounce Back<td>Big Sean<td>33<tr class="odd"><td>28976<td>If I Can&#039;t Have You<td>Shawn Mendes<td>33<tr><td>29586<td>In My Blood<td>Shawn Mendes<td>33<tr class="odd"><td>38424<td>Mercy<td>Shawn Mendes<td>33<tr><td>41136<td>Nervous<td>Shawn Mendes<td>33<tr class="odd"><td>50677<td>Scars To Your Beautiful<td>Alessia Cara<td>33<tr><td>55205<td>Stitches<td>Shawn Mendes<td>33<tr class="odd"><td>61031<td>There&#039;s Nothing Holdin&#039; Me Back<td>Shawn Mendes<td>33<tr><td>62767<td>Treat You Better<td>Shawn Mendes<td>33<tr class="odd"><td>67396<td>Wild Thoughts (feat. Rihanna &amp; Bryson Tiller)<td>DJ Khaled<td>33<tr><td>39760<td>Motivation<td>Normani<td>32<tr class="odd"><td>63971<td>Uproar<td>Lil Wayne<td>32<tr><td>10974<td>Christmas (Baby Please Come Home)<td>Mariah Carey<td>31<tr class="odd"><td>42693<td>O Holy Night<td>Mariah Carey<td>31<tr><td>44940<td>Party Up<td>DMX<td>31<tr class="odd"><td>55944<td>Summertime Magic<td>Childish Gambino<td>31<tr><td>61292<td>This Is America<td>Childish Gambino<td>31<tr class="odd"><td>628<td>2002<td>Anne-Marie<td>29<tr><td>1521<td>A Thousand Years<td>Christina Perri<td>29<tr class="odd"><td>3714<td>Always Remember Us This Way<td>Lady Gaga<td>29<tr><td>4964<td>Attention<td>Charlie Puth<td>29<tr class="odd"><td>5680<td>Back To You<td>Selena Gomez<td>29<tr><td>5738<td>Bad At Love<td>Halsey<td>29<tr class="odd"><td>5847<td>Bad Romance<td>Lady Gaga<td>29<tr><td>7316<td>Birthday<td>Anne-Marie<td>29<tr class="odd"><td>8586<td>Break Up Song<td>Little Mix<td>29<tr><td>9456<td>Cake By The Ocean<td>DNCE<td>29<tr class="odd"><td>12092<td>Cool<td>Jonas Brothers<td>29<tr><td>12296<td>Counting Stars<td>OneRepublic<td>29<tr class="odd"><td>14322<td>Didn&#039;t I<td>OneRepublic<td>29<tr><td>15122<td>Don&#039;t Call Me Up<td>Mabel<td>29<tr class="odd"><td>16523<td>Easier<td>5 Seconds of Summer<td>29<tr><td>20193<td>Fresh Eyes<td>Andy Grammer<td>29<tr class="odd"><td>22564<td>Graveyard<td>Halsey<td>29<tr><td>22628<td>Green Light<td>Lorde<td>29<tr class="odd"><td>23513<td>Havana<td>Camila Cabello<td>29<tr><td>23582<td>Have Yourself A Merry Little Christmas<td>Sam Smith<td>29<tr class="odd"><td>25253<td>Homemade Dynamite<td>Lorde<td>29<tr><td>25726<td>How Do You Sleep?<td>Sam Smith<td>29<tr class="odd"><td>25761<td>How Long<td>Charlie Puth<td>29<tr><td>27110<td>I Like Me Better<td>Lauv<td>29<tr class="odd"><td>28108<td>I&#039;ll Be There<td>Jess Glynne<td>29<tr><td>28573<td>I&#039;m Not The Only One<td>Sam Smith<td>29<tr class="odd"><td>30107<td>Into You<td>Ariana Grande<td>29<tr><td>30344<td>Issues<td>Julia Michaels<td>29<tr class="odd"><td>31565<td>July<td>Noah Cyrus<td>29<tr><td>34080<td>Let Me<td>ZAYN<td>29<tr class="odd"><td>34465<td>Liar<td>Camila Cabello<td>29<tr><td>35814<td>Lose You To Love Me<td>Selena Gomez<td>29<tr class="odd"><td>36870<td>Lush Life<td>Zara Larsson<td>29<tr><td>37521<td>Malibu<td>Miley Cyrus<td>29<tr class="odd"><td>39254<td>Modern Loneliness<td>Lauv<td>29<tr><td>39715<td>Mother<td>Charlie Puth<td>29<tr class="odd"><td>41325<td>Never Worn White<td>Katy Perry<td>29<tr><td>41516<td>Nice To Meet Ya<td>Niall Horan<td>29<tr class="odd"><td>41619<td>Nightmare<td>Halsey<td>29<tr><td>42002<td>No Promises (feat. Demi Lovato)<td>Cheat Codes<td>29<tr class="odd"><td>42041<td>No Shame<td>5 Seconds of Summer<td>29<tr><td>43123<td>Old Me<td>5 Seconds of Summer<td>29<tr class="odd"><td>43771<td>Only Human<td>Jonas Brothers<td>29<tr><td>45287<td>Perfect Places<td>Lorde<td>29<tr class="odd"><td>48236<td>Rescue Me<td>OneRepublic<td>29<tr><td>49576<td>Ruin My Life<td>Zara Larsson<td>29<tr class="odd"><td>50316<td>Santa Tell Me<td>Ariana Grande<td>29<tr><td>51094<td>Selfish<td>Madison Beer<td>29<tr class="odd"><td>52943<td>Slide Away<td>Miley Cyrus<td>29<tr><td>53015<td>Slow Hands<td>Niall Horan<td>29<tr class="odd"><td>53114<td>Smile<td>Katy Perry<td>29<tr><td>54162<td>Sorry Not Sorry<td>Demi Lovato<td>29<tr class="odd"><td>54987<td>Stay With Me<td>Sam Smith<td>29<tr><td>55520<td>Strip That Down<td>Liam Payne<td>29<tr class="odd"><td>55691<td>Sucker<td>Jonas Brothers<td>29<tr><td>56498<td>Sweet Melody<td>Little Mix<td>29<tr class="odd"><td>56684<td>Symphony (feat. Zara Larsson)<td>Clean Bandit<td>29<tr><td>57164<td>Take Yourself Home<td>Troye Sivan<td>29<tr class="odd"><td>57562<td>Teeth<td>5 Seconds of Summer<td>29<tr><td>57672<td>Tell Me You Love Me<td>Demi Lovato<td>29<tr class="odd"><td>58104<td>That&#039;s What I Like<td>Bruno Mars<td>29<tr><td>61246<td>This City<td>Sam Fischer<td>29<tr class="odd"><td>61445<td>This Town<td>Niall Horan<td>29<tr><td>62317<td>Too Good At Goodbyes<td>Sam Smith<td>29<tr class="odd"><td>66448<td>When I Was Your Man<td>Bruno Mars<td>29<tr><td>67428<td>Wildflower<td>5 Seconds of Summer<td>29<tr class="odd"><td>67732<td>Without Me<td>Halsey<td>29<tr><td>68203<td>Wrong Direction<td>Hailee Steinfeld<td>29<tr class="odd"><td>69538<td>Youngblood<td>5 Seconds of Summer<td>29<tr><td>69827<td>break up with your girlfriend, i&#039;m bored<td>Ariana Grande<td>29<tr class="odd"><td>55609<td>Stunnin&#039; (feat. Harm Franklin)<td>Curtis Waters<td>25<tr><td>710<td>3 Nights<td>Dominic Fike<td>24<tr class="odd"><td>8013<td>Body<td>Loud Luxury<td>24<tr><td>8023<td>Body (feat. brando)<td>Loud Luxury<td>24<tr class="odd"><td>10701<td>Cheap Thrills<td>Sia<td>24<tr><td>12991<td>DNA.<td>Kendrick Lamar<td>24<tr class="odd"><td>15348<td>Don&#039;t Let Me Down (feat. Daya)<td>The Chainsmokers<td>24<tr><td>15495<td>Don&#039;t Start Now<td>Dua Lipa<td>24<tr class="odd"><td>21956<td>Gold<td>Kiiara<td>24<tr><td>23069<td>Hallucinate<td>Dua Lipa<td>24<tr class="odd"><td>24491<td>Hey Brother<td>Avicii<td>24<tr><td>28850<td>IDGAF<td>Dua Lipa<td>24<tr class="odd"><td>34444<td>Levitating<td>Dua Lipa<td>24<tr><td>35501<td>Lonely Together (feat. Rita Ora)<td>Avicii<td>24<tr class="odd"><td>38341<td>Memories (feat. Kid Cudi)<td>David Guetta<td>24<tr><td>39396<td>Money Trees<td>Kendrick Lamar<td>24<tr class="odd"><td>39635<td>More Than You Know<td>Axwell /\ Ingrosso<td>24<tr><td>40704<td>My Way<td>Calvin Harris<td>24<tr class="odd"><td>41409<td>New Rules<td>Dua Lipa<td>24<tr><td>42564<td>Nuh Ready Nuh Ready (feat. PARTYNEXTDOOR)<td>Calvin Harris<td>24<tr class="odd"><td>42850<td>Ocean (feat. Khalid)<td>Martin Garrix<td>24<tr><td>45733<td>Play Date<td>Melanie Martinez<td>24<tr class="odd"><td>49277<td>Rollin (feat. Future &amp; Khalid)<td>Calvin Harris<td>24<tr><td>49413<td>Roses (feat. ROZES)<td>The Chainsmokers<td>24<tr class="odd"><td>52941<td>Slide (feat. Frank Ocean &amp; Migos)<td>Calvin Harris<td>24<tr><td>55961<td>Sun Comes Up (feat. James Arthur)<td>Rudimental<td>24<tr class="odd"><td>59140<td>The Greatest (feat. Kendrick Lamar)<td>Sia<td>24<tr><td>59803<td>The Nights<td>Avicii<td>24<tr class="odd"><td>61061<td>These Days (feat. Jess Glynne, Macklemore &amp; Dan Caplen)<td>Rudimental<td>24<tr><td>62132<td>Together<td>Sia<td>24<tr class="odd"><td>64731<td>Waiting For Love<td>Avicii<td>24<tr><td>64754<td>Wake Me Up<td>Avicii<td>24<tr class="odd"><td>1680<td>ATM<td>J. Cole<td>23<tr><td>29426<td>Immortal<td>J. Cole<td>23<tr class="odd"><td>30048<td>Intentions<td>Justin Bieber<td>23<tr><td>31973<td>KOD<td>J. Cole<td>23<tr class="odd"><td>39142<td>Mistletoe<td>Justin Bieber<td>23<tr><td>42028<td>No Role Modelz<td>J. Cole<td>23<tr class="odd"><td>54151<td>Sorry<td>Justin Bieber<td>23<tr><td>65942<td>What Do You Mean?<td>Justin Bieber<td>23<tr class="odd"><td>24601<td>Hey Ya!<td>Outkast<td>22<tr><td>3508<td>All of Me<td>John Legend<td>21<tr class="odd"><td>28967<td>If I Ain&#039;t Got You<td>Alicia Keys<td>21<tr><td>6864<td>Best Day Ever<td>Mac Miller<td>20<tr class="odd"><td>13313<td>Dang! (feat. Anderson .Paak)<td>Mac Miller<td>20<tr><td>32400<td>Killshot<td>Eminem<td>20<tr class="odd"><td>33246<td>Ladders<td>Mac Miller<td>20<tr><td>48747<td>River (feat. Ed Sheeran)<td>Eminem<td>20<tr class="odd"><td>51083<td>Self Care<td>Mac Miller<td>20<tr><td>60069<td>The Real Slim Shady<td>Eminem<td>20<tr class="odd"><td>67730<td>Without Me<td>Eminem<td>20<tr><td>902<td>7 Minutes<td>Dean Lewis<td>19<tr class="odd"><td>2028<td>Adore You<td>Harry Styles<td>19<tr><td>6294<td>Be Alright<td>Dean Lewis<td>19<tr class="odd"><td>7594<td>Blank Space<td>Taylor Swift<td>19<tr><td>11016<td>Christmas Tree Farm<td>Taylor Swift<td>19<tr class="odd"><td>28853<td>IDK You Yet<td>Alexander 23<td>19<tr><td>34697<td>Lights Up<td>Harry Styles<td>19<tr class="odd"><td>36429<td>Love Story<td>Taylor Swift<td>19<tr><td>36625<td>Lover<td>Taylor Swift<td>19<tr class="odd"><td>37688<td>Maniac<td>Conan Gray<td>19<tr><td>50638<td>Say You Won&#039;t Let Go<td>James Arthur<td>19<tr class="odd"><td>51477<td>Shake It Off<td>Taylor Swift<td>19<tr><td>55640<td>Style<td>Taylor Swift<td>19<tr class="odd"><td>62666<td>Train Wreck<td>James Arthur<td>19<tr><td>65248<td>Watermelon Sugar<td>Harry Styles<td>19<tr class="odd"><td>66070<td>What Makes You Beautiful<td>One Direction<td>19<tr><td>67420<td>Wildest Dreams<td>Taylor Swift<td>19<tr class="odd"><td>69834<td>cardigan<td>Taylor Swift<td>19<tr><td>7677<td>Blinding Lights<td>The Weeknd<td>18<tr class="odd"><td>9564<td>Call Out My Name<td>The Weeknd<td>18<tr><td>9741<td>Can&#039;t Feel My Face<td>The Weeknd<td>18<tr class="odd"><td>11123<td>Circles<td>Post Malone<td>18<tr><td>21739<td>Go Flex<td>Post Malone<td>18<tr class="odd"><td>23947<td>Heartless<td>The Weeknd<td>18<tr><td>26689<td>I Fall Apart<td>Post Malone<td>18<tr class="odd"><td>46779<td>Psycho (feat. Ty Dolla $ign)<td>Post Malone<td>18<tr><td>47604<td>Ransom<td>Lil Tecca<td>18<tr class="odd"><td>48153<td>Reminder<td>The Weeknd<td>18<tr><td>50279<td>Sanguine Paradise<td>Lil Uzi Vert<td>18<tr class="odd"><td>59236<td>The Hills<td>The Weeknd<td>18<tr><td>66932<td>White Iverson<td>Post Malone<td>18<tr class="odd"><td>68157<td>Wow.<td>Post Malone<td>18<tr><td>6443<td>Beat It<td>Michael Jackson<td>17<tr class="odd"><td>7232<td>Billie Jean<td>Michael Jackson<td>17<tr><td>30845<td>It&#039;s You<td>Ali Gatie<td>17<tr class="odd"><td>61563<td>Thriller<td>Michael Jackson<td>17<tr><td>39217<td>Mo Bamba<td>Sheck Wes<td>15<tr class="odd"><td>67794<td>Woah<td>Lil Baby<td>15<tr><td>910<td>7 Years<td>Lukas Graham<td>14<tr class="odd"><td>5812<td>Bad Liar<td>Imagine Dragons<td>14<tr><td>6756<td>Believer<td>Imagine Dragons<td>14<tr class="odd"><td>6972<td>Better Not (feat. Wafia)<td>Louis The Child<td>14<tr><td>8966<td>Bruises<td>Lewis Capaldi<td>14<tr class="odd"><td>11002<td>Christmas Lights<td>Coldplay<td>14<tr><td>13075<td>Daisy<td>Ashnikko<td>14<tr class="odd"><td>15066<td>Don&#039;t<td>Ed Sheeran<td>14<tr><td>15618<td>Don&#039;t Wanna Know<td>Maroon 5<td>14<tr class="odd"><td>20644<td>Galway Girl<td>Ed Sheeran<td>14<tr><td>21541<td>Give Me Love<td>Ed Sheeran<td>14<tr class="odd"><td>24169<td>Hello<td>Adele<td>14<tr><td>25007<td>Hold Me While You Wait<td>Lewis Capaldi<td>14<tr class="odd"><td>28729<td>I&#039;m Yours<td>Jason Mraz<td>14<tr><td>34007<td>Let Her Go<td>Passenger<td>14<tr class="odd"><td>34035<td>Let It Go<td>James Bay<td>14<tr><td>34112<td>Let Me Down Slowly<td>Alec Benjamin<td>14<tr class="odd"><td>35337<td>Location<td>Khalid<td>14<tr><td>36412<td>Love Someone<td>Lukas Graham<td>14<tr class="odd"><td>38336<td>Memories<td>Maroon 5<td>14<tr><td>41819<td>No Idea<td>Don Toliver<td>14<tr class="odd"><td>45056<td>Payphone<td>Maroon 5<td>14<tr><td>45270<td>Perfect<td>Ed Sheeran<td>14<tr class="odd"><td>45414<td>Photograph<td>Ed Sheeran<td>14<tr><td>46842<td>Pumped Up Kicks<td>Foster The People<td>14<tr class="odd"><td>47402<td>Radioactive<td>Imagine Dragons<td>14<tr><td>48526<td>Right Back<td>Khalid<td>14<tr class="odd"><td>51136<td>Send My Love (To Your New Lover)<td>Adele<td>14<tr><td>52078<td>Shotgun<td>George Ezra<td>14<tr class="odd"><td>53770<td>Someone Like You<td>Adele<td>14<tr><td>53794<td>Someone You Loved<td>Lewis Capaldi<td>14<tr class="odd"><td>55739<td>Sugar<td>Maroon 5<td>14<tr><td>56143<td>Supalonely<td>BENEE<td>14<tr class="odd"><td>57073<td>Take Me To Church<td>Hozier<td>14<tr><td>58162<td>The A Team<td>Ed Sheeran<td>14<tr class="odd"><td>61383<td>This Love<td>Maroon 5<td>14<tr><td>61631<td>Thunder<td>Imagine Dragons<td>14<tr class="odd"><td>66068<td>What Lovers Do (feat. SZA)<td>Maroon 5<td>14<tr><td>66323<td>Whatever It Takes<td>Imagine Dragons<td>14<tr class="odd"><td>66574<td>When We Were Young<td>Adele<td>14<tr><td>68398<td>Yellow<td>Coldplay<td>14<tr class="odd"><td>68408<td>Yellow Hearts<td>Ant Saunders<td>14<tr><td>69261<td>You&#039;re Beautiful<td>James Blunt<td>14<tr class="odd"><td>69830<td>bury a friend<td>Billie Eilish<td>14<tr><td>69869<td>everything i wanted<td>Billie Eilish<td>14<tr class="odd"><td>69923<td>ilomilo<td>Billie Eilish<td>14<tr><td>69971<td>my future<td>Billie Eilish<td>14<tr class="odd"><td>55798<td>Suge<td>DaBaby<td>13<tr><td>19555<td>Follow God<td>Kanye West<td>12<tr class="odd"><td>55546<td>Stronger<td>Kanye West<td>12<tr><td>3481<td>All Time Low<td>Jon Bellion<td>10<tr class="odd"><td>21673<td>Glorious (feat. Skylar Grey)<td>Macklemore<td>10<tr><td>22178<td>Good Old Days (feat. Kesha)<td>Macklemore<td>10<tr class="odd"><td>33336<td>Lalala<td>Y2K<td>10<tr><td>43154<td>Old Town Road<td>Lil Nas X<td>10<tr class="odd"><td>44731<td>Paper Planes<td>M.I.A.<td>10<tr><td>48467<td>Ride It<td>Regard<td>10<tr class="odd"><td>53776<td>Someone Said<td>Swae Lee<td>6<tr><td>3173<td>All Girls Are The Same<td>Juice WRLD<td>4<tr class="odd"><td>11009<td>Christmas Time<td>Bryan Adams<td>4<tr><td>36770<td>Lucid Dreams<td>Juice WRLD<td>4<tr class="odd"><td>344<td>(You Make Me Feel Like) A Natural Woman<td>Aretha Franklin<td>0<tr><td>2299<td>Ain&#039;t No Sunshine<td>Bill Withers<td>0<tr class="odd"><td>4698<td>Around the World<td>Daft Punk<td>0<tr><td>4711<td>Arrows<td>Foo Fighters<td>0<tr class="odd"><td>5603<td>Back In Black<td>AC/DC<td>0<tr><td>5785<td>Bad Decisions<td>The Strokes<td>0<tr class="odd"><td>7117<td>Big For Your Boots<td>Stormzy<td>0<tr><td>7434<td>Black Hole Sun<td>Soundgarden<td>0<tr class="odd"><td>7560<td>Blah Blah Blah<td>Armin van Buuren<td>0<tr><td>7620<td>Bleed It Out<td>Linkin Park<td>0<tr class="odd"><td>8044<td>Body Like A Back Road<td>Sam Hunt<td>0<tr><td>8569<td>Break My Stride<td>Matthew Wilder<td>0<tr class="odd"><td>9634<td>Camelot<td>NLE Choppa<td>0<tr><td>10681<td>Chasing Cars<td>Snow Patrol<td>0<tr class="odd"><td>11403<td>Cochise<td>Audioslave<td>0<tr><td>12419<td>Crawling<td>Linkin Park<td>0<tr class="odd"><td>13221<td>Dancin (feat. Luvli) - Krono Remix<td>Aaron Smith<td>0<tr><td>14395<td>Dig Down<td>Muse<td>0<tr class="odd"><td>15514<td>Don&#039;t Stop Believin&#039;<td>Journey<td>0<tr><td>15819<td>Down<td>Marian Hill<td>0<tr class="odd"><td>16191<td>Driving Home for Christmas<td>Chris Rea<td>0<tr><td>18199<td>Faded<td>Alan Walker<td>0<tr class="odd"><td>18222<td>Faint<td>Linkin Park<td>0<tr><td>18713<td>Feel It Still<td>Portugal. The Man<td>0<tr class="odd"><td>18869<td>Fell On Black Days<td>Soundgarden<td>0<tr><td>19912<td>Fortunate Son<td>Creedence Clearwater Revival<td>0<tr class="odd"><td>20091<td>Free Fallin&#039;<td>Tom Petty<td>0<tr><td>20808<td>Genocidal Humanoidz<td>System Of A Down<td>0<tr class="odd"><td>23055<td>Hallelujah<td>Pentatonix<td>0<tr><td>23986<td>Heathens<td>Twenty One Pilots<td>0<tr class="odd"><td>24548<td>Hey Look Ma, I Made It<td>Panic! At The Disco<td>0<tr><td>24708<td>High Hopes<td>Panic! At The Disco<td>0<tr class="odd"><td>25870<td>Human<td>Rag&#039;n&#039;Bone Man<td>0<tr><td>27456<td>I Saw Mommy Kissing Santa Claus<td>The Jackson 5<td>0<tr class="odd"><td>27790<td>I Want You Back<td>The Jackson 5<td>0<tr><td>27939<td>I Won&#039;t Back Down<td>Tom Petty<td>0<tr class="odd"><td>28890<td>Ice Cream (with Selena Gomez)<td>BLACKPINK<td>0<tr><td>30255<td>Is It True<td>Tame Impala<td>0<tr class="odd"><td>31292<td>Jingle Bell Rock<td>Bobby Helms<td>0<tr><td>31479<td>Joy To The World<td>Nat King Cole<td>0<tr class="odd"><td>31633<td>Jumpsuit<td>Twenty One Pilots<td>0<tr><td>32960<td>La Dee Da<td>Foo Fighters<td>0<tr class="odd"><td>33445<td>Last Christmas<td>Wham!<td>0<tr><td>35322<td>Lo/Hi<td>The Black Keys<td>0<tr class="odd"><td>36573<td>Love$ick (feat. A$AP Rocky)<td>Mura Masa<td>0<tr><td>36612<td>Lovefool<td>twocolors<td>0<tr class="odd"><td>36616<td>Lovely Day<td>Bill Withers<td>0<tr><td>38464<td>Merry Xmas Everybody<td>Slade<td>0<tr class="odd"><td>39925<td>Mr. Blue Sky<td>Electric Light Orchestra<td>0<tr><td>39928<td>Mr. Brightside<td>The Killers<td>0<tr class="odd"><td>41334<td>Nevermind<td>Dennis Lloyd<td>0<tr><td>42573<td>Numb<td>Linkin Park<td>0<tr class="odd"><td>43595<td>One More Time<td>Daft Punk<td>0<tr><td>43667<td>One Step Closer<td>Linkin Park<td>0<tr class="odd"><td>43701<td>One Too Many<td>Keith Urban<td>0<tr><td>44437<td>Own It (feat. Ed Sheeran &amp; Burna Boy)<td>Stormzy<td>0<tr class="odd"><td>44742<td>Papercut<td>Linkin Park<td>0<tr><td>46724<td>Protect The Land<td>System Of A Down<td>0<tr class="odd"><td>47830<td>Realize<td>AC/DC<td>0<tr><td>48245<td>Respect<td>Aretha Franklin<td>0<tr class="odd"><td>48453<td>Ride<td>Twenty One Pilots<td>0<tr><td>49128<td>Rockin&#039; Around The Christmas Tree<td>Brenda Lee<td>0<tr class="odd"><td>49609<td>Run<td>Foo Fighters<td>0<tr><td>49618<td>Run For Cover<td>The Killers<td>0<tr class="odd"><td>49743<td>Runnin&#039; Down A Dream<td>Tom Petty<td>0<tr><td>50439<td>Saturnz Barz (feat. Popcaan)<td>Gorillaz<td>0<tr class="odd"><td>50580<td>Say It (feat. Tove Lo)<td>Flume<td>0<tr><td>51293<td>Seven Nation Army<td>The White Stripes<td>0<tr class="odd"><td>52037<td>Shooting Stars<td>Bag Raiders<td>0<tr><td>52073<td>Shot In The Dark<td>AC/DC<td>0<tr class="odd"><td>52484<td>Simmer<td>Hayley Williams<td>0<tr><td>52806<td>Skin<td>Rag&#039;n&#039;Bone Man<td>0<tr class="odd"><td>52919<td>Sleigh Ride<td>Ella Fitzgerald<td>0<tr><td>53106<td>Smells Like Teen Spirit<td>Nirvana<td>0<tr class="odd"><td>53964<td>Somewhere I Belong<td>Linkin Park<td>0<tr><td>54562<td>Spoonman<td>Soundgarden<td>0<tr class="odd"><td>55065<td>Step Into Christmas<td>Elton John<td>0<tr><td>55497<td>Stressed Out<td>Twenty One Pilots<td>0<tr class="odd"><td>56098<td>Sunset Lover<td>Petit Biscuit<td>0<tr><td>56419<td>Sweet Caroline<td>Neil Diamond<td>0<tr class="odd"><td>56457<td>Sweet Home Alabama<td>Lynyrd Skynyrd<td>0<tr><td>59021<td>The Gambler<td>Kenny Rogers<td>0<tr class="odd"><td>59078<td>The Git Up<td>Blanco Brown<td>0<tr><td>60279<td>The Sky Is A Neighborhood<td>Foo Fighters<td>0<tr class="odd"><td>61140<td>Think<td>Aretha Franklin<td>0<tr><td>61492<td>Thought Contagion<td>Muse<td>0<tr class="odd"><td>61934<td>Tints (feat. Kendrick Lamar)<td>Anderson .Paak<td>0<tr><td>63828<td>Unsainted<td>Slipknot<td>0<tr class="odd"><td>64574<td>Vossi Bop<td>Stormzy<td>0<tr><td>65926<td>What Christmas Means To Me<td>Stevie Wonder<td>0<tr class="odd"><td>66003<td>What I&#039;ve Done<td>Linkin Park<td>0<tr><td>67573<td>Winter Wonderland<td>Bing Crosby<td>0<tr class="odd"><td>67933<td>Wonderwall<td>Oasis<td>0<tr><td>69092<td>You Shook Me All Night Long<td>AC/DC<td>0<tr class="odd"><td>69757<td>Zombie<td>The Cranberries<td>0</table>
+</div>
+<form action='' method='post'>
+<p>360 rows <span class='time'>(4.050 s)</span> <a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=select+%2A+from+recommendation%28time+%2708%3A00%27%2Ctime+%2710%3A00%27%2C+%27mai%27%2C+10%2C1%2C0%2C0%29'>Edit</a>, <a href='#warnings-7'>Warnings</a><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qsl('a').onclick = partial(toggle, 'warnings-7');</script>, <a href='#explain-7'>Explain</a><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qsl('a').onclick = partial(toggle, 'explain-7');</script>, <a href='#export-7'>Export</a><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qsl('a').onclick = partial(toggle, 'export-7');</script><span id='export-7' class='hidden'>: <select name='output'><option value="text" selected>open<option value="file">save<option value="gz">gzip</select> <select name='format'><option value="csv">CSV,<option value="csv;">CSV;<option value="tsv">TSV</select><input type='hidden' name='query' value='select * from recommendation(time &#039;08:00&#039;,time &#039;10:00&#039;, &#039;mai&#039;, 10,1,0,0)'> <input type='submit' name='export' value='Export'><input type='hidden' name='token' value='237193:872108'></span>
+</form>
+<div id='warnings-7' class='hidden'>
+NOTICE:  table &quot;decadesrank&quot; does not exist, skipping</div>
+<div id='explain-7' class='hidden'>
+<div class='scrollable'>
+<table cellspacing='0' class='nowrap'>
+<thead><tr><th>QUERY PLAN</thead>
+<tr><td>Function Scan on recommendation  (cost=0.25..10.25 rows=1000 width=76)</table>
+</div>
+</div>
+
+<form action="" method="post" enctype="multipart/form-data" id="form">
+<p><textarea name='query' rows='20' cols='80' class='sqlarea jush-pgsql' spellcheck='false' wrap='off'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);
+DROP FUNCTION IF EXISTS recommendation_helper(time,time,varchar,int,float,float,float);
+
+CREATE OR REPLACE FUNCTION
+    recommendation_helper(fromtime time
+               , totime time
+               , inputstation varchar
+               , topk int
+	       , w1 float, w2 float, w3 float) RETURNS VARCHAR AS $$
+BEGIN
+   RETURN &#039;Inputs: &#039;||fromtime::varchar(5)||&#039; &#039;||totime::varchar(5)||&#039; / &#039;||inputstation||&#039; / &#039;||topk::varchar||&#039; / &#039;||w1::varchar||&#039; &#039;||w2::varchar||&#039; &#039;||w3::varchar ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+DROP TABLE IF EXISTS songsimilarity;
+
+CREATE TABLE songsimilarity(
+    songid       int
+    , songname   text
+    , artistname text
+    , songscore  float
+) ;    
+  
+
+CREATE OR REPLACE FUNCTION
+    recommendation(fromtime time
+               , totime time
+               , inputstation varchar
+               , topk int
+	       , w1 float, w2 float, w3 float)
+    RETURNS SETOF songsimilarity AS $recommendation$
+DECLARE
+   myrow songsimilarity%rowtype ;
+BEGIN
+
+    --  The function to get the corresponding songid within the time period and in that station
+    DROP TABLE IF EXISTS songsplayed;
+    CREATE TABLE songsplayed AS
+    SELECT DISTINCT p.songid as songid
+    FROM playedonradio p
+    WHERE p.station = inputstation and p.playedtime::TIME &gt;= fromtime AND p.playedtime::TIME &lt;= totime;
+
+
+    -- Write to the table get all songs except previous ones
+    DROP TABLE IF EXISTS songsnosuchtime;
+    CREATE TABLE songsnosuchtime AS
+    SELECT DISTINCT s.id as songid FROM songs s
+    EXCEPT SELECT DISTINCT ss.songid FROM songsplayed ss;
+
+
+    -- The function which is to calcualte the gs score
+
+   CREATE OR REPLACE FUNCTION gs(realid BIGINT)
+    RETURNS FLOAT AS $gs$
+    DECLARE
+        score float;
+    BEGIN
+        score = (SELECT SUM(songnum)::float FROM (SELECT COUNT(ss.songid) AS songnum FROM song_genre, songsplayed ss WHERE
+        ss.songid = song_genre.songid AND
+        genre IN 
+                    (SELECT genre FROM song_genre sg WHERE sg.songid = realid)) AS x);
+        RETURN score;
+    END;
+    $gs$ LANGUAGE plpgsql;
+
+    -- The function which is to calculate rs score
+
+    CREATE OR REPLACE FUNCTION rs(realid BIGINT)
+    RETURNS float AS $rs$
+    DECLARE
+        score float;
+        samedecade text;
+        avgrank float;
+        avgrankplayed float;
+    BEGIN
+        SELECT s.decade into samedecade FROM songs s WHERE s.id = realid;
+        IF samedecade IS NULL THEN
+            score = 0;
+            RETURN score;
+        ElSE
+            DROP TABLE IF EXISTS songsrank;
+            CREATE TABLE songsrank AS 
+            SELECT b.songid as songid, s.decade as decade, avg(b.rank) as rank FROM bilboard b, songsplayed sp, songs s
+            WHERE sp.songid = b.songid AND s.id = sp.songid
+            GROUP BY b.songid, s.decade;
+
+            DROP TABLE IF EXISTS decadesrank;
+            
+             
+            SELECT COALESCE(avg(rank), 0) into avgrank FROM bilboard b WHERE b.songid = realid;
+            IF avgrank = 0 THEN
+                score = 0;
+            RETURN score;
+            ElSE
+                SELECT COALESCE(avg(rank), 0) into avgrankplayed FROM songsrank WHERE decade = samedecade;
+
+                IF avgrankplayed = 0 THEN
+                    score = 0;
+                RETURN score;
+                ELSE
+                    IF avgrank - avgrankplayed = 0 THEN
+                        score = 0;
+                    RETURN score;
+                    END IF;
+                    score = 1.0 / abs(avgrank -avgrankplayed);
+                    RETURN score;
+                END IF;
+            END IF;
+        END IF;
+    
+    END;
+    $rs$ LANGUAGE plpgsql;
+
+    -- The function which is to calculate ss score
+
+    CREATE OR REPLACE FUNCTION ss(realid BIGINT)
+    RETURNS FLOAT AS $ss$
+    DECLARE
+        score float;
+        realenergy float;
+        realliveness float;
+        realacoustincness float;
+
+        avgenergy float;
+        avgliveness float;
+        avgacoustincness float;
+
+        denominator float;
+    BEGIN
+        SELECT s.energy, s.liveness, s.acousticness INTO realenergy, realliveness, realacoustincness FROM songs s WHERE id = realid; 
+        IF realenergy IS NULL OR realliveness IS NULL OR realacoustincness IS NULL THEN
+            score = 0;
+        RETURN score;
+        END IF;
+
+        SELECT avg(energy), avg(liveness), avg(acousticness) INTO avgenergy, avgliveness, avgacoustincness FROM songs s, songsplayed sp
+        WHERE s.id = sp.songid;
+
+        IF avgenergy IS NULL OR avgliveness IS NULL OR avgacoustincness IS NULL THEN
+            score = 0;
+        RETURN score;
+        END IF;
+
+        denominator = abs(realenergy - avgenergy) + abs(realliveness - avgliveness) + abs(realacoustincness - avgacoustincness);
+        IF denominator = 0 THEN
+            score = 0;
+        RETURN score;
+        END IF;
+
+        score = 1 / denominator;
+        RETURN score;
+    END;
+    $ss$ LANGUAGE plpgsql;
+
+   FOR myrow IN SELECT s.id as songid
+                       , s.name as songname
+		       , a.name as artistname
+		       , (w1 * gs(s.id)) + (w2 * rs(s.id)) + (w3 * ss(s.id)) as songscore
+         FROM songs s, artists a, songsnosuchtime snp
+         WHERE s.artistid = a.id AND snp.songid = s.id
+         ORDER BY songscore DESC, songname ASC
+   LOOP
+       RETURN NEXT myrow ;
+   END LOOP ;
+   DROP TABLE IF EXISTS songsplayed;
+   DROP TABLE IF EXISTS songsnosuchtime;
+   DROP TABLE IF EXISTS songsrank;
+   DROP TABLE IF EXISTS decadesrank;
+   DROP FUNCTION IF EXISTS gs(BIGINT);
+   DROP FUNCTION IF EXISTS rs(BIGINT);
+   DROP FUNCTION IF EXISTS ss(BIGINT);
+   RETURN ;
+
+END ;
+$recommendation$ LANGUAGE plpgsql;
+select * from recommendation(time &#039;08:00&#039;,time &#039;10:00&#039;, &#039;mai&#039;, 10,1,0,0);
+</textarea><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qs('#form').onsubmit = partial(sqlSubmit, qs('#form'), '/adminer/?pgsql=&username=wangy58&db=db_wangy58&ns=public');</script>
+<p><input type='submit' value='Execute' title='Ctrl+Enter'>
+Limit rows: <input type='number' name='limit' class='size' value=''>
+<label><input type='checkbox' name='error_stops' value='1'>Stop on error</label>
+<label><input type='checkbox' name='only_errors' value='1'>Show only errors</label>
+<input type='hidden' name='token' value='237193:872108'>
+<fieldset><legend><a href='#fieldset-history'>History</a><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qsl('a').onclick = partial(toggle, 'fieldset-history');</script></legend><div id='fieldset-history' class='hidden'>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=6">Edit</a> <span class='time' title='2021-10-31'>02:09:58</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=5">Edit</a> <span class='time' title='2021-10-31'>02:07:53</span> <code class='jush-pgsql'>select * from recommendation(time &#039;08:00&#039;,time &#039;10:00&#039;, &#039;mai&#039;, 10,1,0,0);</code><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=4">Edit</a> <span class='time' title='2021-10-31'>01:53:29</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=3">Edit</a> <span class='time' title='2021-10-31'>01:52:51</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=2">Edit</a> <span class='time' title='2021-10-31'>01:51:58</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=1">Edit</a> <span class='time' title='2021-10-31'>01:43:25</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=0">Edit</a> <span class='time' title='2021-10-31'>01:40:49</span> <code class='jush-pgsql'>DROP FUNCTION IF EXISTS recommendation(time,time,varchar,int,float,float,float);</code><i>…</i><br>
+<input type='submit' name='clear' value='Clear'>
+<a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=&amp;history=all'>Edit all</a>
+</div></fieldset>
+</form>
+</div>
+
+<form action='' method='post'>
+<div id='lang'>Language: <select name='lang'><option value="en" selected>English<option value="ar">العربية<option value="bg">Български<option value="bn">বাংলা<option value="bs">Bosanski<option value="ca">Català<option value="cs">Čeština<option value="da">Dansk<option value="de">Deutsch<option value="el">Ελληνικά<option value="es">Español<option value="et">Eesti<option value="fa">فارسی<option value="fi">Suomi<option value="fr">Français<option value="gl">Galego<option value="he">עברית<option value="hu">Magyar<option value="id">Bahasa Indonesia<option value="it">Italiano<option value="ja">日本語<option value="ka">ქართული<option value="ko">한국어<option value="lt">Lietuvių<option value="ms">Bahasa Melayu<option value="nl">Nederlands<option value="no">Norsk<option value="pl">Polski<option value="pt">Português<option value="pt-br">Português (Brazil)<option value="ro">Limba Română<option value="ru">Русский<option value="sk">Slovenčina<option value="sl">Slovenski<option value="sr">Српски<option value="sv">Svenska<option value="ta">த‌மிழ்<option value="th">ภาษาไทย<option value="tr">Türkçe<option value="uk">Українська<option value="vi">Tiếng Việt<option value="zh">简体中文<option value="zh-tw">繁體中文</select><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">qsl('select').onchange = function () { this.form.submit(); };</script> <input type='submit' value='Use' class='hidden'>
+<input type='hidden' name='token' value='270622:717115'>
+</div>
+</form>
+<form action="" method="post">
+<p class="logout">
+<input type="submit" name="logout" value="Logout" id="logout">
+<input type="hidden" name="token" value="237193:872108">
+</p>
+</form>
+<div id="menu">
+<h1>
+<a href='https://www.adminer.org/' target="_blank" rel="noreferrer noopener" id='h1'>Adminer</a> <span class="version">4.7.6</span>
+<a href="https://www.adminer.org/#download" target="_blank" rel="noreferrer noopener" id="version">4.8.1</a>
+</h1>
+<script src='../externals/jush/modules/jush.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script src='../externals/jush/modules/jush-textarea.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script src='../externals/jush/modules/jush-txt.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script src='../externals/jush/modules/jush-js.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script src='../externals/jush/modules/jush-pgsql.js' nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc="></script>
+<script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">
+var jushLinks = { pgsql: [ '?pgsql=&username=wangy58&db=db_wangy58&ns=public&table=$&', /\b(artists|bilboard|playedonradio|points|song_genre|songs|songsimilarity)\b/g ] };
+jushLinks.bac = jushLinks.pgsql;
+jushLinks.bra = jushLinks.pgsql;
+jushLinks.sqlite_quo = jushLinks.pgsql;
+jushLinks.mssql_bra = jushLinks.pgsql;
+bodyLoad('13');
+</script>
+<form action="">
+<p id="dbs">
+<input type="hidden" name="pgsql" value=""><input type="hidden" name="username" value="wangy58"><span title='database'>DB</span>: <select name='db'><option value=""><option>baking<option selected>db_wangy58<option>mediumstreaming<option>ministreaming<option>postgres<option>radiodb_hw4<option>template0<option>template1</select><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">mixin(qsl('select'), {onmousedown: dbMouseDown, onchange: dbChange});</script>
+<input type='submit' value='Use' class='hidden'>
+<br>Schema: <select name='ns'><option value=""><option>information_schema<option>pg_catalog<option>pg_temp_5<option>pg_toast<option>pg_toast_temp_5<option selected>public</select><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">mixin(qsl('select'), {onmousedown: dbMouseDown, onchange: dbChange});</script>
+<input type='hidden' name='sql' value=''></p></form>
+<p class='links'><a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;sql=' class='active '>SQL command</a>
+<a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;import='>Import</a>
+<a href='?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;dump=' id='dump'>Export</a>
+<a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;create=">Create table</a>
+<ul id='tables'><script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">mixin(qs('#tables'), {onmouseover: menuOver, onmouseout: menuOut});</script>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=artists" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=artists" class='structure' title='Show structure'>artists</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=bilboard" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=bilboard" class='structure' title='Show structure'>bilboard</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=playedonradio" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=playedonradio" class='structure' title='Show structure'>playedonradio</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=points" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=points" class='structure' title='Show structure'>points</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=song_genre" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=song_genre" class='structure' title='Show structure'>song_genre</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=songs" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=songs" class='structure' title='Show structure'>songs</a>
+<li><a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;select=songsimilarity" class='select'>select</a> <a href="?pgsql=&amp;username=wangy58&amp;db=db_wangy58&amp;ns=public&amp;table=songsimilarity" class='structure' title='Show structure'>songsimilarity</a>
+</ul>
+</div>
+<script nonce="ZGViMGVmMGJmYzU5MTI3Mjc1ZmFjMGI4MzI2OTM0Zjc=">setupSubmitHighlight(document);</script>

@@ -1,0 +1,20 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+Continuing studying springboot and finish user's function in the backend.
+Help build the environment for the front-end and make them successfully
+access our API. Trying to adjust function for appointment to avoid user's
+invalid input error, but still have some bugs, plan to fix them in the next week.
+
+Next week:
+Plan to fix the bugs for the appointment function and continuing learning
+web-development about springboot.
+
+Block:
+There is currently no block there.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/9739c391fc54ffd2b70c2be2b9346ace7c0651ef
+https://github.com/ACertainScientific/MeetUp/commit/2c597a6287e6cf1ed35af09513865a2f66869275

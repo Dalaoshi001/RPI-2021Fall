@@ -1,0 +1,13 @@
+import psycopg2 as dbapi2
+
+db = dbapi2.connect(port = 5432,
+		database = 'baking',
+		user='sibeladali',
+		password='sibeladali')
+
+cur = db.cursor()
+cur.execute('select * from bakers where baker like 'M%' ;')
+
+for row in cur.fetchall():
+  print(row)
+

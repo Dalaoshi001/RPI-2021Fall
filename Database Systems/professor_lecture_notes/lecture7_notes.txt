@@ -1,0 +1,63 @@
+
+Lecture 7
+------------
+
+E-R Diagrams
+Entity-Relationship Diagrams
+------------------------------
+
+Object-oriented, can be converted to relational data model
+
+Entities: main classes of objects we would like to store information about
+
+An entity must have a name, and a key, and some number of attributes
+     - no multivalued attributes
+     - each attribute should be about the entity, not describe another
+       entity
+     - each entity is in BCNF (the key for the entity implies all the
+       other attributes), if not possible, then in 3NF
+
+Relationships connect 2 or more entities
+
+------------
+
+University database
+---------------------
+
+Students: (rin), fname, lname, year, email, address, ssn, pronouns, gpa
+Faculty/Staff: (rin), fname, lname, email, address, ssn, pronouns, position
+Departments: (code), name
+Majors: (code), name
+Courses: (courseno, majorabbr), name, credits, whenoffered
+Sections: (crn), capacity
+Buildings: (abbr), name, lat, long
+Rooms: (id), number
+
+Students take courses
+Students have majors
+Students have advisors  (*)
+Courses are taught by faculty
+Coruses are taught in classrooms
+Classrooms are in buildings
+
+----
+
+Converting ER diagrams to relational data model
+-------------------------------------------------
+
+1. Map each entity to a relation: the key of the entity becomes the
+key of the relation and attributes of the entity become attributes of
+the relation
+
+2. For each binary relationship:
+
+- If the relationship has a one side (one to many or one to one), then
+  take key for entity on the one side and include it as an attribute
+  in the other entity
+
+- If the relationship is many to many, create a new relation which has
+  the key of all the entities it connects and the combination of the keys
+  if the key of this new relation.
+
+If the relationship has attributes, then include the attributes where
+you put the relationship.

@@ -1,0 +1,173 @@
+
+Announcements:
+---------------------------------------------
+
+1. Please fill your course evaluations
+
+2. FINAL EXAM on: Thursday, 12/16 6:30pm-9:30pm
+   Report any remaining conflicts by the end day today
+
+3. Lecture 25 exercise will be either today or thursday depending on
+   how far we get today.
+
+
+Concurrency
+--------------
+
+Locking based mechanisms: deadlocks are possible!
+
+Resolving deadlocks:
+
+-> Avoid deadlocks
+-> Detect deadlocks and resolve them
+
+Two phase locking (2PL): Lock with S lock for reading and X lock for writing
+and no new locks can be received after releasing one lock.
+
+Strict two phase locking (S2PL): Lock with S lock for reading and X
+lock for writing and hold all locks until commit, and then release all
+locks.
+
+2PL and S2PL both guarantee serializability.
+
+Set transaction isolation levels:
+
+   SET ISOLATION LEVEL READ COMMITTED;
+   SET ISOLATION LEVEL  REPEATABLE READ;
+       -- Two phase locking guarantees this, but
+       -- can still suffer from phantom updates for tuple based locks.
+   SET ISOLATION LEVEL SERIALIZABLE ;
+
+What is being locked?
+    Table
+    Data Page
+    Tuple
+
+Suppose we are locking tuples.
+
+T1: select count(*) from R WHERE A = 5;
+    lock every tuple with a shared lock
+
+T2: insert into R(A) values(5,..);
+
+Since T1 locks all existing tuples, T2 is going to lead to an
+incorrect count and cna make the schedule non-serializable despite
+using 2PL. --> phantom update problem
+
+
+Multi-level locks:
+
+IX -> intention to write some objects at levels below
+IS -> intention to read some objects at levels below
+
+S -> will read all nodes below this one
+X -> will write all nodes below this one
+
+
+
+Durability
+---------------
+
+(Assume concurrency problem is resolved!)
+
+All write operations are correctly executed:
+
+- If a transaction aborts/rollbacks, then we delete all values
+  written/changed by them
+
+- If a transaction commits, then all its changes are recorded
+  correctly.
+
+Even in the presence of power or software failures.
+
+LOG:
+
+LSN   Operation              PrevLSN
+
+101   T1 update Px A B       -
+102   T2 update Py C D       -
+103   T1 commit              101
+104   T3 update Pz 10 20     -
+105   T3 update Pw E F       104
+106   T2 update Px B G       102
+107   T2 abort               106
+
+Log records:
+
+Ti update Pj before_value after_value
+Ti commit
+Ti abort
+
+For each data page in memory:
+
+Px LSN of first log entry that changed it that is not yet written to
+   disk
+
+For each data page on disk:
+
+Px LSN of last log entry that changed that page
+
+-------------------
+
+What do we want?
+
+- If a transaction aborts/ollbacks, then we want all log entries for
+  values written/changed by them recorded 
+
+- If a transaction commits, then all its changes are recorded (and
+  cannot be lost)
+
+When do I write log back to disk?
+
+-> Write ahead logging (WAL): The log is always ahead of the data pages.
+
+If you are going to write a data page to disk, first flush all of the
+log currently in memory to disk, then the data page can be written to
+disk.
+
+When do I write data pages back to disk?
+
+
+When do I write data for committing transactions?
+
+Implementing a commit:
+------------------------
+
+FORCE: All data pages by a xact must be written to disk before it is
+allowed to commit.
+
+Ti wants to commit:
+
+1. Flush the log to disk (WAL)
+2. Write all pages modified by Ti to disk
+3. Write a commit record to the log, and flush the log
+4. Allow Ti to commit
+
+NO FORCE:
+
+Ti wants to commit:
+
+1. Write a commit record to the log, and flush the log
+2. Allow Ti to commit
+
+
+Force simplifies recovery, but no force allows higher efficiency
+by using data pages in memory for multiple transactions.
+
+
+STEAL OR NO STEAL
+--------------
+
+Do we allow data pages written to disk before a transaction commits?
+
+NO STEAL: Every transaction have their memory space fixed: all pages
+that they read in memory stay in memory until they complete!
+
+No changes by an uncommitted transaction are written to disk, so no
+ undo is needed for recovery
+
+
+STEAL: If a transaction wants to write a page back to disk before it
+commits, flush the log first.
+
+UNDO may be needed for recovery.

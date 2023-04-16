@@ -1,0 +1,195 @@
+
+
+ER diagrams - Converting hierarchies to relational data model
+--------------------------------------------------------------
+
+Three basic options:
+
+1. Map each class to a different relation
+
+A(X,Y)  key: X
+B(X,Z)  key: X
+C(X,W)  key: X
+
+To query B, you must join A and B.
+Pro: simple
+Con: potentially lots of joins
+
+2. Store information about all entities together
+
+A(X,Y)    key: X     (store only A here)
+B(X,Y,Z)  key: X     (store only B here)
+C(X,Y,W)  key: X     (store only C here)
+
+Pro: No joins are necessary
+Con: If something can be both Bs and Cs, then storing redundant Y values.
+     (i.e. if the hierarchy is not disjoint)
+
+If the hierarchy is disjoint, then we can only store it as A or B or
+C.
+
+3. Merge all entities into one
+
+
+ABC(X, Y, Z, W, isB, isC)
+
+If something is a B, then there is no W value.
+If something is a C, then there is no Z value.
+If something is an A, then there is no W or Z value.
+
+Pro: No joins necessary and there is no redundancy
+
+Con: Many attributes with missing values, bad efficiency if ABC is
+much bigger as a result.
+
+
+Review Lecture
+------------------
+
+Complex joins
+
+4NF
+BCNF and 3NF decomposition
+Projecting functional dependencies 
+
+Ternary
+Weak Entity
+
+ games(gameid, name, year, publisher, min_players, max_players, min_age_rec, playtime_min, playtime_max, iscooperative, description, link) 
+ gametypes(gameid, gametype) 
+ gamecategories(gameid, category) 
+ gamemechanics(gameid, mechanic)  
+ gamedesigners(gameid, designername) 
+ onlinegamesites(siteid, url, price_per_month, notes) 
+ gamesonsite(siteid, gameid, isfree, min_players, max_players) 
+ gameprices(gameid, storename, price) 
+ gamereviews(gameid, userid, review_text, review_date, stars, num_likes) 
+ awardsnominations(gameid, awardname, year, iswinner) 
+
+Complex queries:
+
+Return the name, year of all games with the 'sudden death' mechanic:
+
+T1 = select_{mechanic='sudden death'} (gamemechanics)
+T2 = project_{name, year} (games * gamemechanics)
+
+Return the name, year of all games without the 'sudden death' mechanic:
+
+##not correct
+T1 = select_{mechanic<>'sudden death'} (gamemechanics)
+T2 = project_{name, year} (games * gamemechanics)
+##not correct: it only return games that have at least one mechanic
+## that is not sudden death.
+
+
+##correct
+
+T1 = project_{gameid} (select_{mechanic='sudden death'} (gamemechanics))
+T2 = project_{gameid} (games)
+T3 = project_{name, year} (games * (T2-T1))
+
+
+Return the name of all games with exactly two game mechanics:
+
+T1(gameid1, mechanic1) = gamemechanics
+
+T2 = gamemechanics join_{gameid=gameid1 and mechanic<>mechanic1} T1
+     ##T2 is games with at least two game mechanics
+
+T3(gameid2, mechanic2) = gamemechanics
+T4 = T3 join_{gameid=gameid2 and mechanic<>mechanic2 and mechanic1<>mechanic2} T2
+    ##T4 is games with at least three game mechanics
+
+T5 = project_{gameid} (T2) - project_{gameid} (T3)
+     ## games with exactly two game mechanics
+
+T6 = project_{name, year} (T5 * games)
+
+### Find the cheapest store for gameid = 111
+
+## Find stores with a cheaper price than them
+
+T1 = select_{gameid=111} (gameprices)
+   ## all stores for this game
+   
+T2(gameid1, storename1,price1) = T2
+
+T3 = T2 join_{price1<price} T1
+
+### subtract that from all stores for this game (these would be the cheapest)
+T4 = project_{storename} (T1) - project_{storename} (T3)
+
+--------
+
+4NF
+BCNF and 3NF decomposition
+Projecting functional dependencies 
+
+R(A,B,C,D,E,F,G)
+F = {AB->CD, D->A, DE->FG, BG->A}
+## assume F is minimal
+
+Keys: ABE, BEG, BDE
+
+3NF decomposition:
+
+R1(A,B,C,D)  {AB->CD, D->A}
+---   R2(A,D)      {D->A}  remove R2 because R1 has all attributes in R1
+R3(D,E,F,G)  {DE->FG}
+R4(A,B,G)    {BG->A}
+
+
+R1(A,B,C,D)  {AB->CD, D->A} Key: AB, BD, in 3NF, not in BCNF
+R3(D,E,F,G)  {DE->FG}  Key: DE in 3NF and BCNF
+R4(A,B,G)    {BG->A}   Key: BG  in 3NF and BCNF
+R5(B,D,E)    {}        Key: BDE  in 3NF and BCNF
+
+BCNF Decomposition:
+
+R(A,B,C,D,E,F,G)
+F = {AB->CD, D->A, DE->FG, BG->A}
+
+Keys: ABE, BEG, BDE
+
+Pick: AB->CD  AB+ = {A,B,C,D}
+
+R1(A,B,C,D)   {AB->CD, D->A}, key: AB, BD
+              not in BCNF
+
+Decompose R1 using D->A
+R11(A,D)   {D->A}   in BCNF
+R12(B,C,D)  {BD->C} in BCNF
+
+
+R2(A,B,E,F,G)  {BG->A, ABE->FG}, key: BEG, ABE not in BCNF
+
+Decompose R2 using BG->A
+
+R21(A,B,G)     {BG->A} in BCNF
+R22(B,E,F,G)   {BGE->F} in BCNF
+
+Final result:
+
+(A,D)   {D->A}   in BCNF
+(B,C,D)  {BD->C} in BCNF
+(A,B,G)     {BG->A} in BCNF
+(B,E,F,G)   {BGE->F} in BCNF
+
+----------------
+
+4NF
+
+ClassInfo(CRN, AssignmentNo, AssignmentDueDate, OfficeHour)
+
+No implications! (multiple assignments and multiple office hours)
+
+Class => OfficeHour
+Class => AssignmentNo AssignmentDueDate
+
+1111  1   9/1/2021  M4-6
+1111  2   9/8/2021  T3-5
+1111  1   9/1/2021  T3-5
+1111  2   9/8/2021  M4-6
+
+(CRN, AssignmentNo, AssignmentDueDate)
+(CRN, OfficeHour)

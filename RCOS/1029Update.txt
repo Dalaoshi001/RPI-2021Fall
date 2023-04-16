@@ -1,0 +1,20 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+After finishing most of the back-end work, we have some meeting to talk about our results and work
+so far, still try to learn new things to modify our project better. In this week, we successfully set up the
+nacos environment in our computer. Help front-end team to access our API successfully in their computer.
+
+
+Next week:
+Plan to modify our strucutre and add comments, even decide to modify our 
+database and systems to improve the efficiency. Maybe write comments for our API
+more clearly, and add new function to improve our efficiency and functions.
+
+Block:
+There is currently no block there.
+
+link:
+This week, no contribution on github, all on settingup environment.

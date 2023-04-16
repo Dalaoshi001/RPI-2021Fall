@@ -1,0 +1,441 @@
+
+Lecture 4:
+-------------
+
+Normalization Theory
+---------------------
+
+Functional Dependencies (fd):
+
+Given a relation R is given by
+
+A1..An -> B1...Bm
+
+Where A1..An, B1...Bm are attributes in R.
+
+(X -> Y where X and Y are sets of attributes in R)
+
+It means that whenever you have two tuples in R with the same values
+for attributes A1..An, then these tuples must also have the same
+values for attributes B1...Bm.
+
+
+-----------------
+
+
+Showname, Startyear, Creator, StreamSite, URL, ShowSeasons, StreamSeasons
+
+
+Showname -> StartYear, Creator, ShowSeasons  (assuming a single creator)
+StreamSite -> URL
+Showname StreamSite -> StreamSeasons
+URL -> StreamSite
+URL -> URL
+Showname URL -> StreamSeasons
+
+
+
+
+
+
+-------------
+Functional Dependency Inference Rules
+
+Given a relation R and a set F of functional dependencies, the
+following inference rules allows you to find new functional
+dependencies (fds)
+
+
+
+
+1. Trivial (always true for any relation)
+
+If X is a subseteq of Y, then Y->X
+
+e.g.  A->A
+      AB->A
+
+2. Transitivity:
+
+If X -> Y, Y->Z, then X->Z
+
+e.g. AB-> C
+     C -> D
+     then:  AB->D
+
+3. Decomposition
+
+If X -> YZ, then X->Y and X->Z
+
+Showname -> StartYear, Creator, ShowSeasons
+
+Showname -> StartYear
+Showname -> Creator
+Showname -> ShowSeasons 
+
+4. Combining rule
+
+If X->Y and X->Z then X->YZ
+
+e.g.
+Given:
+
+Showname -> StartYear
+Showname -> Creator
+
+Then, Showname -> StartYear, Creator
+
+5. Augmentation rule:
+
+If X->Y, then XZ -> YZ
+
+e.g.
+
+   Given: AB->CD , ABE->CDE
+---------
+
+Given a relation R and a set F of functional dependencies, X->Y is
+implied by F if we can obtain X->Y from F using inference rules.
+
+
+F = {
+Showname -> StartYear, Creator, ShowSeasons
+StreamSite -> URL
+Showname StreamSite -> StreamSeasons
+URL -> StreamSite
+}
+
+
+See if URL -> URL is true given F?
+
+Yes, URL-> URL is trivial.
+
+See if URL -> StreamSite is true given F?
+
+Yes, it is in F.
+
+See if Showname URL -> StreamSeasons  is true given F?
+
+Given
+
+URL -> StreamSite
+
+Showname URL -> Showname StreamSite  Augmentation
+Showname StreamSite -> StreamSeasons
+
+Transitivity: Showname URL -> StreamSeasons
+
+-------------
+
+Closure of a set of attributes:
+
+Given a relation R and a set F of functional dependencies, and a set X
+of attributes in R, the closure of X (denoted by X+) is the set of all
+attributes implied by X with respect to F.
+
+Then, X -> X+ is implied by F.
+
+Algorithm to compute the closure of X:
+
+Step 1: X+ = {X}  Initialize   (X->X)
+
+Step 2: Do until no new attributes are added:
+            find a functional dependency Y->Z such that Y is a subset of X
+	    then add Z to X+.
+
+R(A,B,C,D,E,F,G)
+
+F={
+A->BCD
+E->F
+F->E
+AE->G
+}
+
+A+ = {A}
+A+ = {A,B,C,D}  (A->BCD)  done!
+
+B+ ={B}
+
+E+ ={E}
+E+ = {E,F}
+
+AE+ = {A,E}
+AE+ = {A,B,C,D,E}  (A->BCD) 
+AE+ = {A,B,C,D,E,F}  (E->F)
+AE+ = {A,B,C,D,E,F,G}  (AE->G)
+
+AE-> ABCDEFG
+
+------------------------------------------------------
+
+Key: Given a relation R and fds F, a key is a set of attributes X
+such that:
+
+     (a) X+ includes all attributes in R (uniqueness)
+     (b) and no subset of X satisfies (a)  (minimality)
+
+
+
+R(A,B,C,D,E,F,G)
+
+F={A->BCD, E->F, F->E, AE->G}
+
+AE is a key for R.
+AF is a key for R.
+
+A+ = {A,B,C,D}, F+ = {E,F}
+AF+ = {A,B,C,D,E,F,G}
+
+----------------------
+R1(A,B,C,D,E,F,G)
+F1 = {AB->CD, DE->F, F->G}
+
+Key: ABE
+
+ABE+ = {A,B,C,D,E,F,G}
+
+
+R2(A,B,C,D,E,F,G)
+F2 = {AB->C, BCD->F, F->AEG}
+
+Keys: ABD,  BCD, BDF
+
+
+R3(A,B,C,D,E,F,G)
+F3 = {AB->CDEF, F-> AG}
+
+Keys: AB, FB
+
+R4(A,B,C,D,E,F,G)
+F4 ={AB->CDEF, F->A}
+
+Keys: ABG, FBG
+
+----------
+
+Students(RIN, SSN, Name, Address, Major, Advisor, Email, Hobby)
+
+RIN->SSN, Name, Address, Email
+SSN-> RIN
+RIN, Major -> Advisor
+
+Key: RIN Major Hobby, SSN Major Hobby
+
+-------------
+
+
+SuperKey (superset of key): Given a relation R and fds F, a superkey
+is a set of attributes X such that:
+
+     (a) X+ includes all attributes in R (uniqueness)
+
+
+By definition, any key is a superkey.
+
+R(A,B,C,D)   F={A->BCD}
+
+Key: A
+Superkey: A, AB, AC, AD, ABC, ABD, ACD, ABCD
+
+Normal Forms:
+-------------
+
+Boyce-Codd Normal Form (BCNF):
+
+Given a relation R and a set of fds F, R is in Boyce-Codd Normal Form
+iff, every functional dependency X->Y in F satisfies one of the
+following conditions:
+   (a) X->Y is trivial,  or
+   (b) X is a superkey!
+
+
+R1(A,B,C,D)   F={A->BCD}
+
+Key: A, in BCNF
+
+A->BCD   A is a superkey, R1 is in BCNF
+
+R2(A,B,C,D)   F={AD->B, ABD->C, AC->A}
+
+Key: AD, in BCNF
+
+AD->B     ok, AD is a superkey
+ABD->C    ok, ABD is a superkey
+AC->A     ok, trivial
+
+R3(A,B,C,D)   F={AD->B, AB->C}
+
+Key: AD, is not in BCNF
+
+AD->B    ok, AD is a superkey
+AB->C    no, AB is not a superkey
+
+R4(A,B,C,D)   F={AD->B, B->C}
+
+Key: AD, is not IN BCNF
+
+B->C   B is not a superkey
+
+R5(A,B,C,D)   F={AD->BC, B->A}
+
+Key: AD, BD  (not in BCNF)
+
+AD->BC    ok, AD is a superkey
+B->A      not ok, B is not a superkey
+
+R6(A,B,C,D)   F={A->BC}
+
+Key: AD   Not in BCNF
+
+A->BC, no A is not a superkey
+
+
+
+---------
+
+
+Showname, Startyear, Creator, StreamSite, URL, ShowSeasons, StreamSeasons
+
+
+Showname -> StartYear, Creator, ShowSeasons  (assuming a single creator)
+StreamSite -> URL
+Showname StreamSite -> StreamSeasons
+URL -> StreamSite
+
+Key: Showname Streamsite,   Showname, URL
+
+Showname -> StartYear, Creator, ShowSeasons     not ok, Showname is not a superkey
+
+StreamSite -> URL     not ok, Streamsite is not a superkey
+URL -> StreamSite  not ok, URL is not a superkey
+
+Showname StreamSite -> StreamSeasons,  
+
+Not in BCNF
+-----
+
+If a relation is not in BCNF, then it can have
+
+-> duplicate data, must be updated all for a single change
+-> deleting something may cause a loss of data for another
+   (not being available in a streaming site, means we will loose data about the show)
+
+----------
+
+BASIS FORM:
+
+We say that a set of functional dependencies is in a basis form if
+there is only one attribute on the right hand side.
+
+(You can easily put a set in basis form by using the decomposition rule!)
+
+{A->BCD}  put in basis form: {A->B, A->C, A->D}
+
+
+PRIME ATTRIBUTES:
+
+A prime attribute is an attribute in any key.
+
+R1(A,B,C,D,E,F,G)
+F1 = {AB->CD, DE->F, F->G}
+Key: ABE
+
+Prime attributes: A,B,E
+
+R2(A,B,C,D,E,F,G)
+F2 = {AB->C, BCD->F, F->AEG}
+Keys: ABD,  BCD, BDF
+
+Prime attributes: A,B,C,D,F
+
+----------
+
+Third Normal Form:
+
+Given a relation R and a set of fds F in basis form,
+R is in Third Normal Form iff, every functional dependency X->Y in F
+satisfies one of the following conditions:
+
+   (a) X->Y is trivial,  or
+   (b) X is a superkey, or
+   (c) Y is a prime attribute.
+
+If a relation is in BCNF, then it is also in 3NF.
+
+
+R1(A,B,C,D)   F={A->BCD}
+
+Key: A, in BCNF  -> also in 3NF
+
+A->BCD   A is a superkey, R1 is in BCNF
+
+R2(A,B,C,D)   F={AD->B, ABD->C, AC->A}
+
+Key: AD, in BCNF -> also in 3NF
+
+AD->B     ok, AD is a superkey
+ABD->C    ok, ABD is a superkey
+AC->A     ok, trivial
+
+R3(A,B,C,D)   F={AD->B, AB->C}
+
+Key: AD, is not in BCNF, not in 3NF
+
+AD->B    ok, AD is a superkey
+AB->C    no, AB is not a superkey and C is not a prime attribute
+
+R4(A,B,C,D)   F={AD->B, B->C}
+
+Key: AD, is not IN BCNF, not in BCNF
+
+B->C   B is not a superkey, C is not a prime attribute
+
+R5(A,B,C,D)   F={AD->BC, B->A}
+
+Key: AD, BD  (not in BCNF), but in 3NF!
+
+AD->BC    ok, AD is a superkey
+B->A      not ok for BCNF, B is not a superkey, but ok for 3NF A is a prime attribute
+
+R6(A,B,C,D)   F={A->BC}
+
+Key: AD   Not in BCNF, not in 3NF
+
+A->B, no A is not a superkey, B is not a prime attribute
+A->C, no A is not a superkey, C is not a prime attribute
+
+-----------------------
+Minimal Basis:
+
+A set of functional dependencies is said to be minimal if we cannot
+remove anything from them and still get the same meaning!
+
+Given a set F of fds, F+ is the set of all functinal dependencies I
+can obtain from F using all the inference rules.
+
+Two sets F1, and F2, are equivalent iff F1+ = F2+.
+
+Alternatively:
+
+If every functional dependency X->Y in F1, is implied by F2 (or X+ in
+F2 and check if Y is in it!)
+
+and
+
+If every functional dependency X->Y in F2, is implied by F1 (or X+ in
+F1 and check if Y is in it!)
+
+Then, F1 and F2 are equivalent.
+
+
+F1={A->B, B->C}    F2={A->B,B->C,A->C}
+
+A->C ?
+A+={A,B,C}
+C is in A+
+
+F3={A->B, A->C}    F2={A->B,B->C,A->C}
+
+B->C ?
+B+ = {}

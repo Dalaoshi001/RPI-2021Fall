@@ -1,0 +1,21 @@
+Yihang Wang
+Status Update1
+Project Meetup
+
+This week:
+Finish the room function, which about the operation with the database. Fix the bugs which
+caused by changing structure. Modify database setting to make sure our backend API
+could work successfully. Continue to learn springboot knowledge about web, especially
+Filters and such other things. Help build package and get access to front-end. Fix the 
+maven setting bugs for some of front-end team members.
+
+Next week:
+Kepp continuing getting access with front-end. Try to successfully seeing the front-end's
+pages. And keeping studying springboot and trying to think about how to develope
+for the next step.
+
+Block:
+There is currently no block here.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/b988ebe67d61a7a1045f9575ce0b601a8f92dc1e

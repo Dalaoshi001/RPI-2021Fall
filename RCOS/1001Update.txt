@@ -1,0 +1,23 @@
+Yihang Wang
+Status Update1
+Project Meetup
+
+This week:
+Help classify our Springboot into model, Dao, Mapper, Controller, Service,
+and finisihed our setup for the database. Write example code for modify
+appointment, building in the database. Continued studying Springboot
+and we finially decide to write python to clean our appointment database
+every 24 hours and export it as sql file. In this way, we will save our database
+space.
+
+Next week:
+We will still talk about the design of database and start trying to get access
+to the front-end team to implement at least some functions with them. I will
+also continue to study Springboot for our project.
+
+Block:
+Time is limited, I also need to prepare for my test, which is really bad :(
+I hope to get free from test as early as possible.
+
+Link：
+https://github.com/ACertainScientific/MeetUp/commit/3469533e0698156692d20e0022a39602ca29dade

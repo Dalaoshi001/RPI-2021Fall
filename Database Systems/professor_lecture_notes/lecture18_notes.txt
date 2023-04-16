@@ -1,0 +1,122 @@
+
+Announcements:
+--------------------
+Grading will take some time!!!
+No office hours today
+
+So far
+---------------
+- Hard disk slow (compared to stuff you do in memory)
+- Reading many pages sequentially good (better than random I/O)
+- Must read into memory any page to do anything
+- Unit of read/write: a disk page (or a memory block)
+- Cost of query: number of pages
+- An index is a look up structure
+  - index is stored in memory
+  - index is on a specific attribute (or attributes)
+  - index can be multilevel
+  - cost of query depends on how the index matches the query
+
+
+https://www.youtube.com/watch?v=p-JJp-oLx58
+
+
+Hard disk types:
+-----
+
+Magnetic, cheap
+SSD - solid state, expensive
+
+
+ioping:
+-------------
+us -> microseconds, 1/1 000 000
+ms -> miliseconds, 1/1 000 
+
+
+Magnetic Disk access:
+
+Reading a portion of the disk:
+
+     Seek time    (move the disk head)
+        + Rotational Latency  (more or less fixed)
+	+ Data transfer time  (getting faster with denser disks)
+
+
+Terms:
+----------
+
+
+Disk/Platter
+Surfaces
+
+Tracks
+
+Cylinder
+
+Sectors
+
+Page -> Block    [8K]
+
+Disk page address:   Surface - Track - Sector
+
+Meta-verse: Data unit center no + Trailer no + Computer No + Hard disk No + Surface - Track - Sector
+
+
+
+Fast HD: 3.5 Inch – Seagate BarraCuda Pro ‘ST12000DM0007’
+
+12TB
+
+RPM: 7200
+Read and Write Speed: 243 MB/s, 236 MB/s
+512 bytes/sector
+8 platters
+
+----------
+
+Seek time: 6.46ms (approx)
+
+Rotational latency:   60000/(2*7200) =  4.17 ms
+
+Transfer time: (number of consecutive pages) * transfer time (0.03 ms/page)
+
+
+Cost to read 100 random pages:  100* (6.46+4.17+0.03)=1000 ms
+
+Cost to read 100 sequential pages: 6.46+4.17+100*0.03=  13 ms
+----------------------------
+
+
+
+select current_setting('block_size');
+
+select relname, relpages
+from pg_class pc, pg_user pu
+where pc.relowner = pu.usesysid and pu.usename = user;
+
+
+What is the cost of answering this query?
+-------------------------------------------
+
+select count(*) from playedonradio where station = 'mai';
+
+- Cost: number of pages I have to read to answer this query
+
+- Sequential scan: read every page the "playedonradio" is stored in and
+  check for station and increment the counter
+
+-- Create an index on playedonradio(station)
+
+Each index entry: key value (station) and pointer to a tuple
+
+- Index only scan for
+
+select count(*) from playedonradio where station = 'mai';
+
+  - Read all pages for the index until the end of station 'mai'
+
+select count(distinct songid) from playedonradio where station = 'mai';
+
+  - Read all index pages to find all tuples for station = 'mai'
+    + Read all found tuples to find songids

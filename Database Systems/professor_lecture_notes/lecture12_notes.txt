@@ -1,0 +1,349 @@
+
+Hw #4 due this friday
+Lecture exercise 12, due on sunday
+
+------------------------
+
+For each baker, how many times they were in position 1, only
+return bakers who won it at least two times.
+
+SELECT
+   baker
+   , count(*) as numepisodes
+FROM
+   technicals
+WHERE
+   rank = 1
+GROUP BY
+   baker
+HAVING
+   count(*) > 1
+ORDER BY
+   numepisodes desc ;
+
+For each baker and each technical positions 1-4, return how many times
+each baker had that position, only if they held that rank more than once.
+
+
+SELECT
+   baker
+   , rank
+   , count(*) as numepisodes
+   , min(episodeid)
+   , max(episodeid)
+FROM
+   technicals
+WHERE
+   rank <= 4
+GROUP BY
+   baker
+   , rank
+HAVING
+   count(distinct episodeid) > 1
+ORDER BY
+   baker
+   , rank
+;
+
+-----------
+
+For each baker, find how many times they were a judge favorite.
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(*) as numtimes
+FROM
+   favorites f
+   , bakers b
+WHERE
+   f.baker = b.baker
+GROUP BY
+   b.baker
+UNION
+(
+SELECT baker, fullname, 0 FROM bakers
+EXCEPT
+SELECT
+   b.baker
+   , b.fullname
+   , 0
+FROM
+   bakers b
+   , favorites f
+WHERE
+   b.baker = f.baker
+) ;
+
+
+
+INNER JOIN   vs OUTER JOIN
+-----------------------------
+
+Inner join
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(*) as numtimes
+FROM
+   favorites f
+   , bakers b
+WHERE
+   f.baker = b.baker
+GROUP BY
+   b.baker
+
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(*) as numtimes
+FROM
+   favorites f
+   inner join bakers b
+   on f.baker = b.baker
+GROUP BY
+   b.baker ;
+
+
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(f.episodeid) as numtimes
+FROM
+   bakers b
+   left outer join favorites f
+   on f.baker = b.baker
+GROUP BY
+   b.baker ;
+
+Find bakers who were never favorites:
+
+SELECT baker FROM bakers
+EXCEPT
+SELECT baker FROM favorites ;
+
+SELECT baker, fullname
+FROM bakers
+EXCEPT
+SELECT
+   b.baker
+   , b.fullname
+FROM
+   bakers b
+   , favorites f
+WHERE
+   b.baker = f.baker;
+
+
+
+SELECT
+   b.baker
+   , b.fullname
+FROM
+   bakers b
+   left outer join favorites f
+   on f.baker = b.baker
+WHERE
+   f.baker is null ;
+
+
+
+For each baker, find total number of times they won star baker.
+
+SELECT 
+   b.baker
+   , b.fullname
+   , count(DISTINCT r.episodeid) + count(DISTINCT f.episodeid) as correctcount
+   , count(r.episodeid) + count(f.episodeid)  as incorrect
+FROM
+   bakers b
+   left join results r
+   on b.baker = r.baker and r.result = 'star baker'
+   left join favorites f
+   on b.baker = f.baker
+GROUP BY
+   b.baker
+;
+
+LIMIT statement
+-------------------
+
+SELECT
+FROM
+WHERE
+GROUP BY
+HAVING
+	UNION
+SELECT
+FROM
+WHERE
+GROUP BY
+HAVING
+
+ORDER BY
+LIMIT K;
+
+-----------------------------
+
+Anonymous queries:
+
+
+For each baker, find the number of times they were #1 in technicals
+
+SELECT
+   baker
+   , count(*) as numepisodes
+FROM
+   technicals
+WHERE
+   rank = 1
+GROUP BY
+   baker
+HAVING
+   count(*) > 1
+
+
+Return maximum number of times a baker has been number 1 in technicals.
+
+SELECT
+   max(numepisodes)
+FROM
+   ( SELECT
+       baker
+      , count(*) as numepisodes
+   FROM
+       technicals
+   WHERE
+       rank = 1
+   GROUP BY
+       baker
+   HAVING
+       count(*) > 1
+   ) as rank1    
+
+
+For each baker, return total number of times they were star baker
+and number 1 in technicals.
+
+--- Not necessary to use anonymous relations in this case.
+
+SELECT
+   r.baker
+   , count(*)+rank1.numepisodes as numstarbakerwinsandrank1
+FROM
+   ( SELECT
+       baker
+      , count(*) as numepisodes
+   FROM
+       technicals
+   WHERE
+       rank = 1
+   GROUP BY
+       baker
+   HAVING
+       count(*) > 1
+   ) as rank1    
+   , results r
+WHERE
+   rank1.baker = r.baker
+   and r.result = 'star baker'
+GROUP BY
+   r.baker
+   , rank1.numepisodes
+
+For each baker, find the average viewership of episodes in which they
+won star baker and the average viewership of episodes in which they
+placed first in a technical challenge. Only return bakers who won star
+baker.
+
+SELECT
+   r.baker
+   , avg(e.viewers7day)::numeric(5,2) as avgviewership
+   , avg(e2.viewers7day)::numeric(5,2) as avgviewership2
+   , count(distinct e.id) as e1
+   , count(distinct e2.id) as e2
+FROM
+   episodes e
+   join results r 
+   on e.id = r.episodeid  and r.result = 'star baker'
+   left join technicals t
+   on r.baker = t.baker and t.rank =1
+   left join episodes e2
+   on t.episodeid = e2.id
+GROUP BY
+   r.baker
+
+
+-- HW: Write this using anonymous queries
+
+--------------
+
+Scalar Queries: that returns 1 tuple with 1 attribute
+
+select count(*) from results
+where result = 'star baker' and baker = 'Briony' ;
+
+
+Find people who won star baker more times than Briony
+
+SELECT
+   baker
+FROM
+   results
+WHERE
+   result = 'star baker'
+GROUP BY
+   baker
+HAVING
+   count(*) >
+      (select count(*) from results
+       where result = 'star baker' and baker = 'Briony');
+
+
+Find the air date of episodes that aired after the first episode to
+reach 9 million in viewers7day.
+
+SELECT
+   id
+   , firstaired
+FROM
+   episodes
+WHERE
+   firstaired >
+          (SELECT min(firstaired)
+	   FROM episodes
+	   WHERE viewers7day >= 9);
+
+Set operations:
+
+Value in (SET)
+Value not in (SET)
+Value >=ALL (SET)
+Value <=ALL (SET)
+
+Value <=ANY (SET)
+Value >ANY (SET)
+
+
+select
+   id
+from
+   episodes
+where
+   viewers7day in (select viewers7day From episodes where viewers7day>9) ;
+
+
+
+SELECT
+   id
+   , firstaired
+FROM
+   episodes
+WHERE
+   firstaired <=ALL
+          (SELECT firstaired
+	   FROM episodes
+	   WHERE viewers7day >= 9);

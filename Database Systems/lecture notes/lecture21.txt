@@ -1,0 +1,62 @@
+Query processing
+---------------------
+
+Cost of queries: Number of disk pages read/written
+
+Each relation algebra operator implements the same interface
+
+Iterator interface: 
+---------------------
+
+Initialize: Allocate memory space to the operator, initialize
+relations to be read
+
+Get_Next: Do processing needed to produce 1 block of output
+
+Close: Deallocate memory space and release any resources
+
+----------------------
+
+For each operator； let M is the number of blocks of  memory allocated
+
+Relations R ->
+	PAGES(R)  is the number of pages for relation R
+
+	TUPLES(R) is the number of tuples in the relation R
+
+	often, TUPLES(R) >> PAGES(R)
+
+Single pass operations:
+----------------------------
+
+Sequential scan: Read every page of R to find tuples where C is true
+	SELECT * FROM R WHERE C
+
+cost = PAGES(R)
+
+Duplicated Removal ():
+	"DISTINCT"
+
+	COST = If m - 1 blocks
+		hold all uique
+		     ----> PAGES(R)
+
+GROUP BY 	A, B, sum(C), avg(D)...
+
+COST = If results fit in M - 1 blocks
+	PAGES(R)
+
+
+
+
+R UNION ALL S
+
+COST = PAGES(R) + PAGES(S)
+----------------------------------
+R UNION S
+
+COST = IF M -1 is sufficient memory, PAGES(R) + PAGES(S)
+----------------------------------------------------------------
+R EXCEPT S
+
+COST = If M-1 block can hold unique values of R, then PAGES(R) + PAGES(S)

@@ -1,0 +1,138 @@
+
+Exam this thursday
+-------------------------
+
+select
+  student_id,
+  grade,
+  case when grade = 'A' then 4
+          when grade = 'B' then 3
+           when grade = 'A-' then 3.7
+          when grade  = 'B-' then 2.7
+          when grade = 'B+' then 3.4
+          when grade is null then null
+           else 0
+   end
+FROM
+  transcript;
+
+
+select
+  day,
+  time,
+  count(*), avg(price)
+from
+  events
+group by grouping sets
+  ((day, time), (day), (time));
+
+
+select
+  day,
+  time,
+  count(*), avg(price)
+from
+  events
+group by rollup
+  (day, time)
+
+Roll up (A, B, C)
+
+-> （A, B, C), (A, B), (A), ()
+
+
+
+select
+  day,
+  time,
+  count(*), avg(price)
+from
+  events
+group by cube
+  (day, time)
+
+Cube(A, B) -> (A, B), (A), (B), ()
+
+
+SQL Review
+~~~~~~~~
+
+SELECT A.b, count(*)
+FROM  A, B, C
+WHERE  A.a = 5
+             and B.b = C.c
+             and upper(A.b) = 'ABC'
+GROUP BY
+             A.b, B.d
+HAVING
+             count(*) > 4
+             and count(distinct b.c) = count(distinct c.d)
+
+----
+
+For All queries
+
+requirments(rin, courseid)
+student(rin, major)
+transcript(rin, courseid, grade)
+
+Find students who fullfilled all requirments.
+
+For each student,
+	check that there does not exist a required course
+	that they did not complete!
+
+
+select
+  s.rin
+from
+  students s
+where
+  not exists (select * requirments r where r.major = s.major
+                      and not exists (select 1 from transcript t where t.rin = s.rin and t.courseid = r.courseid and t.grade is not null))
+
+
+find all students for whom number of requirments that they completed is equal to the total number of requirments that they have.
+
+select
+  s.rin
+from
+  students s,
+  requirment r,
+  transcript t
+where
+  s.rin = t.rin
+  and t.courseid = r.courseid
+  and r.major = s.major
+  and t.grade is not null and t.grade <> 'F'
+group by
+  s.rin, s.major
+having
+  count(*) = (select count(*)  from requirments r2 where r2.major = s.major );
+
+attr in (query)
+attr not in (query)
+
+exists (query)
+not exists (query)
+
+not exists (selcet 1 .....)
+
+
+---------------
+
+insert into relation values ()
+
+insert into relation select .....;
+
+update relation
+set attr = value
+where condition;
+
+update baker
+set numwins = (select count(*) from results r where r.result = 'star baker'
+                         and r.baker = baker.baker)
+where age < 40;
+
+delete from relation1, relation2
+where 0 = (select ...);

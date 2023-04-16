@@ -1,0 +1,157 @@
+
+Announcements
+---------------
+
+Hw#7 to be assigned later today (friday morning to latest)
+    Due on Monday November 29th
+
+Expect another homework after that
+
+FINAL EXAM on: Thursday, 12/16 6:30pm-9:30pm
+
+Please email me all conflicts
+  -> What course does it conflict with and who is the professor
+  
+Query Processing
+-----------------
+
+Cost of queries: Number of disk pages read/written
+
+
+Each relational algebra operator implements the same interface
+
+Iterator interface:
+---------------------
+
+Initialize: Allocate memory space to the operator, initialize
+relations to be read
+
+Get_Next: Do processing needed to produce 1 block of output
+
+Close: Deallocate memory space and release any resources
+
+---------------
+
+For each operator: let M is the number of blocks of memory allocated
+
+Relations R ->
+   PAGES(R)  is the number of pages for relation R
+
+   TUPLES(R)  is the numebr of tuples in the relation R
+
+   Often, TUPLES(R) >> PAGES(R)
+
+Single pass operations:
+------------------------
+
+
+Sequential scan  (R)
+    PAGES(R) and only needs M=1 blocks
+
+
+Duplicate Removal (R)
+Group by (R)
+   -Depends on whether M-1 blocks is sufficient to hold the
+   temporary results in memory
+
+R union all S
+R union S
+R except all S
+R except S
+R intersect all S
+R intersect S
+   -Depends on whether M-1 blocks is sufficient to hold the
+   temporary results in memory
+
+See costs in hand written notes
+
+
+Index Scan
+-----------
+
+Relation R
+
+PAGES(R) = 2,000
+
+TUPLES(R) = 20,000
+
+(How many tuples of R per page on average? 10 )
+
+Index I on R(C)
+
+with 3 levels (root, internal, leaf)
+and 400 nodes at leaf level
+
+( Each leaf node of I1 on average indexes how many tuples? -20000/400= 50)
+
+
+TUPLES(R.C=10) = 120
+
+Q1: SELECT A,B FROM R WHERE C=10;
+
+Cost of query Q1:
+
+Sequential scan: Cost = 2,000 pages
+
+Using index scan with I1 (M=2):
+
+      From index = Root + Internal + 3 or 4 leaf nodes = 5 or 6 pages (nodes)
+      From relation = 120 pages in the worst case
+                      (each tuple is in a different page)
+
+      Total = 126 (or 125)
+
+
+PAGES(R) = 2,000
+
+TUPLES(R) = 20,000
+
+(How many tuples of R per page on average? 10 )
+
+Index I2 on R(B,C)
+    with 3 levels (root, internal, leaf)
+    and 800 nodes at leaf level
+
+(Each leaf node of I2 on average indexes how many tuples? -20000/800= 25)
+
+TUPLES(R.C=10) = 120
+
+Q1: SELECT A,B FROM R WHERE C=10;
+
+Cost of Q1 using I2:
+       Index scanning cost  + Relation scanning cost
+       2+ 800 + 120 (worst case) = 922
+
+
+Sequantial scan = 2000
+Using I1 = 126
+Using I2 = 922
+
+Index I3 on R(C,A,B)
+    with 3 levels (root, internal, leaf)
+    and 1200 nodes at leaf level
+(Each leaf node of I3 on average indexes how many tuples? -20000/1200= 16 tuples)
+
+Q1: SELECT A,B FROM R WHERE C=10;
+
+120 tuples are stored in how many leaf nodes?  120/16= 8 approx
+Cost of Q1 using I3:
+       Index scanning cost  + Relation scanning cost
+       2 + 8                + 0 (index already stores A and B)
+
+Index types:
+
+1. Selective index for a condition C: only a few tuples match condition C
+   (very low relation scan cost)
+
+2. Indices that enable index only searches (storing attributes needed
+for a query)
+
+Q2: SELECT A,B FROM R WHERE C=10 AND D > 5;
+
+Index I3 on R(C,A,B)
+Scan index I3 using C=10, then read matching tuples to check on D>5
+
+Cost of answering Q2 using I3?
+       Index scanning cost  + Relation scanning cost
+       2 + 8                + 120 (worst case, all tuples for C=10)

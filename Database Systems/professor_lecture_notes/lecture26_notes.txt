@@ -1,0 +1,191 @@
+
+Last lecture:
+
+Durability and Database Tuning
+
+Log contents after crash
+
+LSN  Operation      PrevLSN
+-----------------------------
+101  T1 update P1   - 
+102  T2 update P2   - 
+103  T3 update P3   - 
+104  T2 update P4   102 
+105  T4 update P5   - 
+106  T2 update P6   104
+107  T3 commit      103
+108  T4 update P3   105
+109  T1 update P4   101
+110  T4 abort       108
+
+
+Data Pages After Crash
+
+PageId PageLSN
+---------------
+P1     101
+P2       -
+P3     108
+P4       -
+P5     105 
+P6     106
+
+
+PageLSN: the lsn of the last log entry that modified this page at the
+time it was written to disk
+
+ARIES Recovery assuming there is NO FORCE and there IS STEAL.
+
+Step 1: Analysis: go through the log from the beginning to find
+what happened in the database
+
+DPT (dirty page table):
+
+PageID and LSN of the first entry that modified this page that may not
+have been written to disk
+
+TT (transaction table):
+
+Tid LSN 
+
+Tid of all transactions that are active at the time of the crash and
+LSN of the last action by that transaction
+
+Step 2: Redo all updates by committed transactions from the beginning
+of log till the end (in forward order!) - these are all transactions
+that are not currently in TT
+
+- Read a page updated by a transaction, check if PageLSN >= LogLSN,
+then skip otherwise READ the action/update.
+
+Also REDO all UNDO records!
+
+Step 3: Abort and rollback all active transactions in TT by undoing
+their actions
+
+- Undo the largest LSN from TT, and replace it with the PrevLSN of the
+  same transaction
+
+-> Write UNDO record for each action, read the page into memory, if
+   pageLSN >= LogLSN, then UNDO the action.
+
+-------
+
+Checkpointing is a way to save the current state,
+
+Write the current TT and DPT to log, and flush the log to disk
+
+
+A different scenario with a checkpoint:
+-------------------------------------------
+
+
+LSN  Operation      PrevLSN
+-----------------------------
+101  T1 update P1   - 
+102  T2 update P2   - 
+103  T3 update P3   - 
+104  T2 update P4   102 
+105  T4 update P5   - 
+106  T2 update P6   104
+107  T3 commit      103
+108  checkpoint:
+       TT: T1 101, T2 106, T4 105
+       DPT: P4 104, P6 106
+109  T4 update P3   105
+110  T1 update P4   101
+111  T4 abort       108
+
+
+       TT: T1 110, T2 106, T4 109
+       DPT: P4 104, P6 106, P3 109
+
+
+Data Pages After Crash
+
+PageId PageLSN
+---------------
+P1     101
+P2     102
+P3     108
+P4       -
+P5     105 
+P6     106
+
+
+
+Step 1: Change analysis to start from the most recent check point
+
+First, record DPT and TT at the time of check point
+
+and continue updating DPT and TT from this point on
+
+Step 2: Start the REDO phase from the smallest LSN in DPT.
+
+
+Database Tuning
+---------------------
+
+
+Workload: All queries + Updates and how frequently they are run!
+
+What are some things we can do?
+
+
+- Tune DB to the system: configure memory use, cache use,
+  CPU/multicore use, etc.
+
+- Divide up a table to multiple relations: highly normalized
+
+R(A,B,C,D,E)
+
+A-> A,B,C,D,E
+
+
+R1(A,B,C)
+R2(A,D,E)
+
+A-> A,B,C,D,E
+
+A column store:  (A,B) (A,C), (A,D), (A,E)
+
+- Denormalize (still use rarely):
+
+Instead of
+
+R(A,B,C) and S(A,D,E)
+
+where A->BC, AD->E
+
+suppose we store RS(A,B,C,D,E) to avoid joins
+
+
+---
+
+Indexing:
+
+- Indices speed up selections but slow down update/delete/insert
+
+- Create smaller indices, especially for selective queries like for
+  conditions like:
+
+A= 5
+B='abc'
+
+- For queries that have order by or a range search, think about
+  creating a clustered relation, i.e. store the relation sorted
+  according to an attribute.
+
+You must periodically resort the relation to maintain this.
+There is only one attribute you can sort by (primary access method)
+
+order by A
+A>=5 
+
+- For other queries, create indices for frequently queried attributes
+  and conditions, which may be useful even if the conditions are
+  selective.
+
+select a,b,c from r where d>10;
+
+Index on R(d,a,b,c)

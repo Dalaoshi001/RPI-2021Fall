@@ -1,0 +1,183 @@
+
+Announcements:
+----------------
+
+- Lecture 2 to be graded very soon!
+- Lecture 3 exercise to be released a bit after class - announced on Submitty
+- Homework 1 to be released later today, due next monday
+
+Lecture 3:
+-------------
+
+-------------------------------
+MarvelHeroes(heroname, realname, power, location, multiverseid)
+   Key: heroname, multiverseid
+
+DCHeroes(heroname, realname, power, location, multiverseid)
+   Key: heroname, multiverseid
+
+Movies(movieid, name, release_date)
+
+HeroInMovie(movieid, heroname, multiverseid)
+-------------------------------
+
+Find name and location of all heroes in Movie titled 'Avengers'.
+
+T1(movieid1, name1, release_date1) = select_{title = 'Avengers'} (Movies)
+T2 = T1 x HeroInMovie
+T3(heroname1,multiverseid1) = project_{heroname,multiverseid} (select_{movieid = movieid1} (T2))
+T4 = T3 x MarvelHeroes
+T5 = project_{heroname, location} (select_{heroname=heroname1 and multiverseid =multiverseid1} T4)
+
+
+Join operation
+
+---------------
+
+R join_{C} S = select_{C} (R x S) if R and S have no attributes in
+common and
+C is a join condition (a boolean condition containing expressions of
+the form A op B where A is an attribute from R and B is an attribute
+from S)
+
+T1(movieid1, name1, release_date1) = select_{title = 'Avengers'} (Movies)
+T2 = T1 join_{movieid=movieid1} HeroInMovie
+T3(heroname1, multiverseid1) = project_{heroname,multiverseid} (T2)
+T4 = T3 join_{heroname=heroname1 and multiverseid=multiverseid1} MarvelHeroes
+T5 = project_{heroname, location} (T4)
+
+----------
+
+Find the id and title of all movies starring a hero with the power to 'Stop Time'.
+
+T1 = project_{heroname,multiverseid) select_{power = 'stop time'}(MarvelHeroes)
+T2 = project_{heroname,multiverseid) select_{power = 'stop time'}(DCHeroes)
+T3(heroname1,multiverseid1) = T1 union T2
+T4(heroname1,movieid1, heroname, multiverseid1)  = T3 join_{heroname=heroname1 and multiverseid=multiverseid1} HeroInMovie
+T5 = project_{movieid, title} (T4 join_{movieid = movieid1} Movies)
+
+---------------------
+
+Natural Join
+
+R * S is a join of R and S for the join condition of equality of all
+attributes that are in common to R and S. Result does not repeat
+attributes with the same name.
+
+
+T1 = MarvelHeroes * HeroInMovie    (join over heroname and multiverseid)
+     T1 has schema: (heroname, realname, power, location, multiverseid, movieid)
+T2 = T1 * Movies
+     T2 has schema: (heroname, realname, power, location, multiverseid, movieid, name, release_date)
+
+--------------
+
+Query: Return the heroname of all heroes that were in a movie in 2020 and in 2019.
+
+T1 = project_{heroname} (select_{year=2019} (Movies) * HeroInMovie * (MarvelHeroes union DCHeroes))
+T2 = project_{heroname} (select_{year=2020} (Movies) * HeroInMovie * (MarvelHeroes union DCHeroes))
+T3 = T1 intersect T2
+
+----------
+
+Option 2:
+
+T1 = project_{heroname} (select_{year=2019} (Movies) * HeroInMovie * (MarvelHeroes union DCHeroes))
+T2 = project_{heroname} (select_{year=2020} (Movies) * HeroInMovie * (MarvelHeroes union DCHeroes))
+T3 = T1 * T2
+
+---------
+
+T1 = MarvelHeroes * Movies  -- same as Cartesian product
+
+T2 = MarvelHeroes * DCHeroes -- same as Intersection
+
+-------------
+Return heroname of all heroes who were in a movie in two consecutive year.
+
+T1= Movies * HeroInMovie * (MarvelHeroes union DCHeroes)
+T2 = project_{heroname, multiverseid, movieyear} (T1)
+T3(heroname1, multiverseid1, movieyear1) = T2
+
+T4 = T2 x T3
+T5 = select_{heroname=heroname1 and multiverseid=multiverseid1 and year = year1+1} (T5)  --- same hero, but consecutive year
+
+T6 = project_{heroname} (T5)
+
+
+*** Note in this query, it is not actually necessary to join with
+    MarvelHeroes and DCHeroes, unless we need an attribute from those
+    relations like the location. I missed this in class. The query is
+    correct, but just has unnecessary operations.
+
+---------------------
+
+Return heroname of all heroes who were NEVER in a movie in two consecutive years.
+
+T7 = project_{heroname} (MarvelHeroes union DCHeroes)  -- All heroes
+T8 = T7 - T6
+
+-----------------
+
+
+Normalization Theory
+---------------------
+
+Functional Dependencies:
+
+Given a relation R is given by
+
+A1..An -> B1...Bm
+
+Where A1..An, B1...Bm are attributes in R.
+
+It means that whenever you have two tuples in R with the same values
+for attributes A1..An, then these tuples must also have the same
+values for attributes B1...Bm.
+
+Showname, Startyear, Creator, StreamSite, URL, ShowSeasons, StreamSeasons
+
+
+Showname -> StartYear, Creator, ShowSeasons  (assuming a single creator)
+StreamSite -> URL
+Showname StreamSite -> StreamSeasons
+
+-------------
+
+Showname -> Showname
+Showname -> Showname, StartYear
+ShowName StreamSite -> URL StreamSite StreamSeasons
+
+---------------
+Functional Dependency Inference Rules
+
+Given a relation R and a set F of functional dependencies, the
+following inference rules allows you to find new functional
+dependencies (fds)
+
+1. Trivial (always true for any relation)
+
+If A is a subseteq of B, then B->A
+
+2. Transitivity:
+
+If X -> Y, Y->Z, then X->Z
+
+3. Decomposition
+
+If X -> YZ, then X->Y and X->Z
+
+Showname -> StartYear, Creator, ShowSeasons
+
+Showname -> StartYear
+Showname -> Creator
+Showname -> ShowSeasons 
+
+4. Combining rule
+
+If X->Y and X->Z then X->YZ
+
+
+5. Augmentation rule:
+
+If X->Y, then XZ -> YZ

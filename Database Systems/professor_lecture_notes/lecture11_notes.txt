@@ -1,0 +1,297 @@
+
+Lecture 11
+------------
+
+
+
+SQL
+------
+
+
+SELECT baker
+FROM results
+WHERE result = 'eliminated';
+
+
+
+SELECT DISTINCT baker
+FROM results
+WHERE result = 'star baker';
+
+SELECT episodeid, baker
+FROM results
+WHERE result = 'star baker'
+ORDER BY episodeid desc
+;
+
+
+SELECT
+   b.fullname
+   , s.episodeid
+FROM
+   bakers b
+   , signatures s
+WHERE
+   b.baker = s.baker
+   and lower(s.make) like '%cardamom%'
+ORDER BY
+   b.fullname ;
+
+
+-- Find the fullname of bakers who used 'lemon' in signature
+-- challenges for two back to back episodes
+
+SELECT DISTINCT
+    b.fullname
+FROM
+    signatures s1
+    , signatures s2
+    , bakers b
+WHERE
+    s1.baker = b.baker
+    and s2.baker = s1.baker
+    and s2.episodeid = s1.episodeid+1
+    and lower(s2.make) like '%lemon%' 
+    and lower(s1.make) like '%lemon%' ;
+
+
+-- Find the full name of bakers who were eliminated
+-- in an episode with 9.5 or more viewers7day, order by name asc
+
+
+SELECT
+    b.fullname
+FROM
+    bakers b
+    , results r
+    , episodes e
+WHERE
+    b.baker = r.baker
+    and r.episodeid = e.id
+    and e.viewers7day >= 9.5
+    and r.result = 'eliminated'
+ORDER BY
+    b.fullname ASC;
+
+----------------
+
+Set operations in SQL:
+
+UNION/EXCEPT/INTERSECT
+
+SELECT
+FROM
+WHERE
+  UNION/EXCEPT/INTERSECT
+SELECT
+FROM
+WHERE
+  UNION/EXCEPT/INTERSECT
+SELECT
+FROM
+WHERE  
+
+
+Select all bakers who have used lemon in signature or showstopper
+challenges. Return baker name.
+
+SELECT
+   baker
+FROM
+   showstoppers
+WHERE
+   lower(make) like '%lemon%'
+UNION
+SELECT
+   baker
+FROM
+   signatures
+WHERE
+   lower(make) like '%lemon%';
+
+Select all bakers who have used lemon in signature AND showstopper
+challenges. Return baker name.
+
+SELECT
+   baker
+FROM
+   showstoppers
+WHERE
+   lower(make) like '%lemon%'
+INTERSECT
+SELECT
+   baker
+FROM
+   signatures
+WHERE
+   lower(make) like '%lemon%';
+
+SELECT DISTINCT
+   si.baker
+FROM
+   signatures si
+   , showstoppers sh
+WHERE
+   si.baker = sh.baker
+   and lower(si.make) like '%lemon%'
+   and lower(sh.make) like '%lemon%';
+   
+-- Select all bakers who have used chocolate in showstopper make, but
+-- never in signature challenge. Return baker name.
+
+SELECT
+   b.baker
+   , b.fullname
+FROM
+   showstoppers s
+   , bakers b
+WHERE
+   b.baker = s.baker
+   and lower(s.make) like '%chocolate%'
+EXCEPT
+SELECT
+   b.baker 
+   , b.fullname
+FROM
+   signatures s
+   , bakers b
+WHERE
+   s.baker = b.baker
+   and lower(s.make) like '%chocolate%';
+
+
+BAG OPERATIONS
+---------------
+
+R UNION ALL S = {t occurs (m+n) times | t occurs: m times in R and n times in S}  
+
+R INTERSECT ALL S = {t occurs min(m,n) | t occurs: m times in R and n times in S}  
+
+R EXCEPT ALL S = {t occurs max(0,(m-n)) times  | t occurs: m times in R and n times in S}  
+
+create table tmp1 (id int) ;
+insert into tmp1 values(1) ;
+insert into tmp1 values(2) ;
+insert into tmp1 values(2) ;
+insert into tmp1 values(3) ;
+insert into tmp1 values(3) ;
+insert into tmp1 values(3) ;
+create table tmp2 (id int) ;
+insert into tmp2 values(2) ;
+insert into tmp2 values(3) ;
+insert into tmp2 values(3) ;
+insert into tmp2 values(3) ;
+insert into tmp2 values(3) ;
+insert into tmp2 values(4) ;
+insert into tmp2 values(4) ;
+
+
+AGGREGATES
+------------
+
+SELECT
+   count(*) as numtuples
+   , count(distinct baker) as numbakers
+FROM
+   signatures
+WHERE
+   lower(make) like '%lemon%';
+
+
+SELECT
+    count(distinct s.baker) as numbakers
+   , max(e.viewers7day) as maxviewers
+   , count(distinct e.id) as numepisodes
+   , avg(e.viewers7day)::numeric(4,2) as avgviewers
+FROM
+   signatures s
+   , episodes e
+WHERE
+   s.episodeid = e.id
+   and lower(make) like '%lemon%';
+
+-- Find for each baker, how many times they used
+-- lemon in their signature make
+
+SELECT
+   baker
+   , count(*) as numbakes
+FROM
+   signatures
+WHERE
+   lower(make) like '%lemon%'
+GROUP BY
+   baker ;
+
+
+-- Find for each episode, how many bakers used
+-- lemon in their signature make
+
+SELECT
+   episodeid
+   , count(*) as numbakers2
+FROM
+   signatures
+WHERE
+   lower(make) like '%lemon%'
+GROUP BY
+   episodeid ;
+
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(*) as numepisodes
+FROM
+   signatures s
+   , bakers b
+WHERE
+   b.baker = s.baker
+   and lower(s.make) like '%lemon%'
+GROUP BY
+   b.baker
+   , b.fullname;
+
+
+
+SELECT
+   b.baker
+   , b.fullname
+   , count(*) as numepisodes
+FROM
+   signatures s
+   , bakers b
+WHERE
+   b.baker = s.baker
+   and lower(s.make) like '%lemon%'
+GROUP BY
+   b.baker
+   , b.fullname
+HAVING
+   count(*) > 1
+;
+
+
+
+SELECT
+   b.baker
+   , b.fullname
+FROM
+   showstoppers s
+   , bakers b
+WHERE
+   b.baker = s.baker
+   and lower(s.make) like '%chocolate%'
+EXCEPT
+SELECT
+   b2.baker  as baker1
+   , b2.fullname
+FROM
+   signatures s
+   , bakers b2
+WHERE
+   s.baker = b2.baker
+   and lower(s.make) like '%chocolate%'
+ORDER BY
+    fullname
+;

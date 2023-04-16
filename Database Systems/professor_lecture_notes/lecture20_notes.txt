@@ -1,0 +1,88 @@
+
+Secondary storage continued!
+-------------------------------
+Lecture exercise today
+Still no exam results, sorry about that.
+
+
+create index playedonradio1_idx on playedonradio(station,songid);
+
+create index playedonradio2_idx on playedonradio(station);
+
+
+select songid from playedonradio where station = 'mai' ;
+
+select station from playedonradio where songid = 1234 ;
+
+B-trees are super useful
+----------------------------
+
+Index on R(X,Y) can be used for many types of searches (to different
+levels of effectiveness)
+
+effectiveness = how much of the leaf level do I need to scan
+
+X=1 and Y=5   or   X=1 and Y>=5 and Y<=10
+X=1   or     X>=1 and X<=4
+
+X>=1 and X<=4 and Y=2  (Y condition is mostly irrelevant)
+
+Y=2 (Y condition is irrelevant, scan the whole index)
+
+
+
+But wait, are there other types of indices?
+------------------------------------------------
+
+R-tree (points, any geometric object)
+   balanced tree
+   Postgresql -> GIST trees
+
+Unbalanaced trees -> Quadtrees and k-d trees
+   Postgresql -> Sp-GIST trees
+
+
+
+
+create extension pg_trgm; 
+
+create table rs as select * from rollingstonetop500 ;
+
+alter table rs add review tsvector ;
+
+update rs set review = to_tsvector(critic) ;
+
+create index review_idx on rs using gin(review) ;
+
+
+Inverted index:
+
+W1 ->  t1:2,4  t4:4,6
+
+
+select a.name, r.album
+from artists a, rs r
+where r.artistid = a.id
+      and r.review @@ to_tsquery('(masterpiece | avantgarde) & (comtemporary | modern)');
+
+
+--------------
+
+Secondary Index   vs.    Primary Index
+-----------------------------------------
+
+select * from playedonradio where station = 'mai';
+
+Secondary indices do not change how the relation is stored on disk
+Just creates look up structures
+
+Primary indices change how to store the data
+
+
+Hashing is a way to create a primary index
+Hashing is useful for equality searches
+Hash on R(A) is useful for queries: A=x
+
+
+Primary index structures are useful for some queries but
+need to be maintained to remain effective

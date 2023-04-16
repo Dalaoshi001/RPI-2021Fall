@@ -1,0 +1,150 @@
+
+Lecture 24 - Concurrency
+---------------------------
+
+Serial execution of transactions are accepted as correct.
+
+Goal of concurrency is to ensure that even though operations are
+executed concurrently, the end result of the transactions is equal
+to a serial execution.
+
+Abstract transactions Ti as sequence of
+
+ri(X) wi(X) ri(Y) wi(Y) commit/rollback
+
+A schedule is what took place in the db, as a combination
+of read/write operations of different transactions
+
+Schedule S1: r1(X) r2(X) w2(X) r2(Y) w2(Y) w1(X) r1(Y) w1(Y) 
+
+Schedule S2: r1(X) w1(X) r1(Y) w1(Y) r2(X) w2(X) r2(Y) w2(Y) 
+
+Schedule S3: r2(X) w2(X) r2(Y) w2(Y) r1(X) w1(X) r1(Y) w1(Y)
+
+S2 and S3 are serial schedules, S1 is not.
+
+Two schedules are going to produce the same result in the DB
+if they read the same values and write values in the same order.
+
+Example:
+
+S1:  r1(X) r2(Y) w2(Y) w1(X) r2(X) w2(X)
+
+S2:  r2(Y) w2(Y) r1(X) w1(X) r2(X) w2(X)
+
+These two are the same because all the values are read are guaranteed
+to be the same, and written in the same order.
+
+S3:  r1(X) w1(X) w2(X)
+
+S4:  r1(X) w2(X) w1(X) 
+
+The order of write is swapped, so S3 and S4 may not produce the same result.
+
+To check for this, we will look at only the conflicting operations
+between two different transactions:
+
+Conflicts: Two operations by two different transactions is a conflict
+if they are on the same item and one of the two is a write operation.
+
+r1(X) r2(X) is not a conflict!
+
+r1(X) w2(X) is a conflict!
+w1(X) r2(X) is a conflict!
+w1(X) w2(X) is a conflict!
+
+If the order is changed for:
+
+r1(X) w2(X)
+w1(X) r2(X)
+
+then the value read will be different.
+
+If the order is changed for:
+
+w1(X) w2(X)
+
+then the final value written will be different.
+
+Two schedules are conflict equivalent (i.e. guaranteed to produce the
+same result) if all conflict in both occur in the same order.
+
+
+A schedule is serializable if it is guaranteed to be equivalent to a
+serial schedule.
+
+S1: r1(x) w1(x) r2(x) w2(x)
+S2: r2(x) w2(x) r1(x) w1(x)
+
+S3: r1(x) r2(x) w2(x) w1(x) 
+
+Conflicts in S3:
+
+r1(x) w2(x)  no, this is swapped in S2
+r2(x) w1(x)  no, this is swapped in S1
+w2(x) w1(x)  no, this is swapped in S1
+
+Do these occur in the same order as S1?  No
+Do these occur in the same order as S2?  No
+
+S3 is not serializable.
+
+
+S4: r1(x) r2(x) w1(x) w2(x)
+
+
+To check whether a schedule is serializable, create a conflict graph:
+
+Each node will be a transaction
+
+Each edge is a conflict: An edge from Ti -> Tj exists, if there is a
+conflict of the form ri(X).... wj(X), or wi(X)... wj(X) or
+wi(X).... rj(X)
+
+If the conflict graph has a cycle, then the schedule is not serializable.
+
+If the conflict graph has no cycles, then the schedule IS
+serializable.  Then, a topological sort of the graph will produce a
+serial schedule that is equivalent to this schedule.
+
+S4: r1(x) r2(x) w1(x) w2(x)
+
+r1(x) w2(x)
+r2(x) w1(x)
+w1(x) w2(x)
+
+T1 <-> T2
+Has a cycle, so not serializable.
+
+
+Locking based concurrency control
+-----------------------------------
+
+Before any transaction reads or writes an item X, it must get a lock
+on the item X.
+    --> if the lock is not available, transaction is suspended and
+        waits until the lock is available.
+
+Allow two types of locks:
+
+S -> shared lock (read lock), typically used for reading items
+X -> exclusive lock (write lock), typically used for writing items
+
+
+Two phase locking Protocol (2PL):
+-----------------------------------
+
+In 2PL, a transaction may not get a new lock after it releases a lock.
+
+Two phases:
+
+-> Growing phase: transaction may get new locks.
+
+-> Shrinking phase: transaction may only release locks (cannot get new
+   locks).
+
+We allow transactions to upgrade their lock from read to write without
+releasing it if they are the only one holding a read lock on that
+item.
+
+Any schedule that is possible under 2PL is serializable!

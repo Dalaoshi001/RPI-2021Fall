@@ -1,0 +1,208 @@
+
+Lecture 2:
+-------------
+
+Class exercise to be released later today (some config debugging in progress!)
+
+A database is a set of relations.
+
+A relation is a set of tuples, each tuple has values for attributes of
+that relation.
+
+Key: A key is a minimal set of attributes such that no two tuples in
+the relation can have the same values for the key.
+
+Student(RIN, SSN, FirstName, LastName, Email)
+
+Key: RIN
+     SSN
+     Email
+
+
+StudentInfo(RIN, SSN, FirstName, LastName, Email, Major, Advisor)
+
+Students can have multiple majors, for a major and student, there is a
+single advisor, an advisor can only advise one major for student
+
+Key: RIN, Major
+     Email, Najor
+     SSN, Major
+     RIN, Advisor
+     Email, Advisor
+     SSN, Advisor
+
+
+StudentInfo2(RIN, SSN, FirstName, LastName, Email, Major, Advisor)
+
+Students can have multiple majors, for a major and student, there is a
+single advisor
+
+Key: RIN, Major
+     Email, Najor
+     SSN, Major
+
+
+Relational Algebra
+---------------------
+
+Relational algebra consists of a set of operations that takes as input
+a set of tuples (or two sets of tuples) and return a new relation (a
+new set of tuples).
+
+
+MarvelHeroes(heroname, realname, power, location, multiverseid)
+Key: heroname, multiverseid
+
+
+DCHeroes(heroname, realname, power, location, multiverseid)
+Key: heroname, multiverseid
+
+Movies(movieid, name, release_date)
+HeroInMovie(movieid, heroname, multiverseid)
+
+Set Operations
+------------------
+
+Set compatibility: Two relations are set compatible, if they have the
+same data model: same attributes and attributes have the same name.
+
+Set Union:
+
+R union S = {set of all tuples that are either in R or S or both if R
+and S are set compatible}
+
+
+Set Intersection
+
+R interect S = {set of all tuples that are either in R and S if R
+and S are set compatible}
+
+Set Difference
+
+R - S = {the set of all tuples in R that are NOT in S, if R and S are
+set compatible}
+
+-----------------
+
+Example:
+
+R1 = MarvelHeroes union DCHeroes
+All heroes in either universe
+
+R2 = MarvelHeroes - DCHeroes
+All heroes that are only in the Marvel Universe
+(in this case, same as MarvelHeroes)
+
+R3 = MarvelHeroes intersect DCHeroes
+All heroes that are in both Marvel and DC Universes
+(in this case empty)
+
+
+Projection
+--------------
+Given a relation R
+
+Project_{A1,...,An} (R) = {all tuples in R, but only the attributes in the projection}
+
+Find name of all heroes in the Marvel Universe
+R1 = project_{heroname} (MarvelHeroes)
+
+Find all multiverses in the Marvel Universe
+R2 = project_{multiuniverseid} (MarvelHeroes)
+
+
+R3 = (project_{multiverseid} (MarvelHeroes)) intersect
+     (project_{multiverseid} (DCHeroes))
+All multiverses that are common (assuming the same id means the same universe)
+
+Find all locations that are unique to MarvelUniverse Heroes
+
+R4 = (project_{location} (MarvelHeroes) -- all locations in Marvel Universe
+R5 = (project_{location} (DCHeroes) -- all locations in DC Universe
+R6 = R4 - R5 --- locations only in Marvel Universe
+
+R7 = project_{heroname, multiverseid} (MarvelHeroes)
+R8 = project_{locations, multiverseid} (MarvelHeroes)
+
+
+Selection
+------------
+
+Given a relation R and a boolean condition C over the attributes of R:
+
+select_C (R) = {the set of all tuples in R that satisfy the condition C}
+
+Find name of all heroes who are located in NYC and in multiverse 1.
+
+
+R1 = project_{heroname} (select_{location='NYC' and multiverseid=1} (MarvelHeroes))
+
+R2 = project_{heroname} (select_{location='NYC' and multiverseid=1} (DCHeroes))
+R3 = R1 union R2
+
+----------
+Find name of all heroes from multiverse=2 who where in a movie.
+
+project_{heroname} (select_{multiverseid = 2} (HeroInMovie))
+
+
+Find name of all Marvel heroes from multiverse=2 who where in a movie.
+
+(project_{heroname} (select_{multiverseid = 2} (HeroInMovie)))
+intersect (project_{heroname} ((select_{multiverseid = 2} MarvelHeroes))
+
+-----
+Rename operator
+
+Given a relation R with data model R(A1,A2,...,An), rename will name
+every attribute in R.
+
+S(B1,B2,...,Bn) = R
+
+------------
+
+Cartesian Product
+-----------------
+
+Given two relations R(A1,..,An) and S(B1,..,Bm) such that R and S do
+not have any attributes in common,
+
+R x S = {Set of all tuples (r,s) such that r is a tuple in R, s is a
+tuple in S, and (r,s) has attributes (A1,..,An,B1,..,Bm)}
+
+-----------------------
+
+Find heroes and the multiverse they are from in the new spiderman movie 
+
+M1(movieid1, name1, release_date1) = Movies  --- rename
+
+R1 = M1 x HeroInMovie
+R2 = select_{movieid1=movieid} (R1)
+R3 = select_{moviename = 'No way home'} (R2)
+R4 = project_{heroname, multiverseid} (R3)
+
+-----------------------
+
+Find all locations that the heroes in the 'Avengers End Game' are from.
+
+Movies -> moviename
+HeroInMovie -> to find which hero is in the movie
+MarvelHeroes -> for location
+
+
+R1(movieid1} = project{movieid} (select_{moviename = 'Avengers End Game'} (Movies))
+
+R2 = R1 x HeroInMovie
+R3 = select_{movieid1=movieid} (R3) ---> heroes in this movie
+
+R4(heroname1, realname1, power1, location1, multiverseid1) = MarvelHeroes
+
+R5 = R3 x R4
+             -- attributes in R5: movieid1, heroname, multiverseid,
+	                          heroname1, realname1, power1,
+	                          location1, multiverseid1
+
+R6 = select_{heroname=heroname1 and multiverseid=multiverseid1} (R5)
+                   -- same hero from R3 and R4
+
+R7 = project_{location1} (R6)

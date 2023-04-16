@@ -1,0 +1,283 @@
+
+Lecture 6 
+-------------
+
+Minimal vs. Minimal Basis
+---------------------------
+
+{AD->B, AD->C} --> minimal basis
+
+{AD->BC} --> minimal but not basis
+
+
+3NF Decomposition
+---------------------
+Guaranteed to be lossless and dependency preserving!
+
+Given a relation R and a set F of fds that is minimal, the 3NF
+decomposition is computed as follows:
+
+1. For each fd X->Y, create a new relation with attributes X union Y.
+
+2. Remove any relation Rx if there is another relation Ry that has all
+the attribute in Rx.
+
+3. If there is NO relation that contains all the attributes of one of
+the keys of R, then add an extra relation for one of the keys.
+
+Example: R(A,B,C,D,E,F)
+         F= {AB->C, C->B, BD->E, DF->A}
+
+Keys: BDF, CDF
+
+R1(A,B,C)    {AB->C, C->B}
+R2(B,C)      {C->B}   -- remove!
+R3(B,D,E)    {BD->E}
+R4(A,D,F)    {DF->A}
+R5(B,D,F)
+
+Final set:
+
+R1(A,B,C)    {AB->C, C->B}:   Key: AB, AC  
+R3(B,D,E)    {BD->E}          Key: BD
+R4(A,D,F)    {DF->A}          Key: DF
+R5(B,D,F)                     Key: B,D,F
+
+Lossless, let's prove using Chase algorithm:
+
+ F= {AB->C, C->B, BD->E, DF->A}
+
+   A  B  C  D  E  F
+   a  b  c  d1 e1 f1
+   a2 b  c2 d  e  f2
+   a  b3 c3 d  e3 f
+   a4 b  c4 d  e4 f
+
+BD->E
+
+   A  B  C  D  E  F
+   a  b  c  d1 e1 f1
+   a2 b  c2 d  e  f2
+   a  b3 c3 d  e3 f
+   a4 b  c4 d  e  f
+
+DF->A
+
+   A  B  C  D  E  F
+   a  b  c  d1 e1 f1
+   a2 b  c2 d  e  f2
+   a  b3 c3 d  e3 f
+   a  b  c4 d  e  f
+
+AB->C
+
+   A  B  C  D  E  F
+   a  b  c  d1 e1 f1
+   a2 b  c2 d  e  f2
+   a  b3 c3 d  e3 f
+   a  b  c  d  e  f  <- no subscripts! so this is lossless
+
+-----------
+
+R(A,B,C,D,E)    F= {AB->CD, D->E}, Key: AB
+
+3NF Decomposition
+(A,B,C,D)     {AB->CD}
+(D,E)         {D->E}
+
+
+Suppose F was in basis form
+R(A,B,C,D,E)    F= {AB->C, AB->D, D->E}, Key: AB
+
+3NF Decomposition
+(A,B,C)   AB->C
+(A,B,D)   AB->D
+(D,E)     D->E
+
+----------------
+
+BCNF Decomposition
+--------------------
+
+All BCNF decompositions are lossless, but not necessarily dependency
+preserving.
+
+Given a relation R and a set F of fds that is minimal, the BCNF
+decomposition is computed as follows:
+
+- Suppose X->Y is an fd in F that violates BCNF. Then, compute X+.
+
+Create two relations:
+
+   1. R1(X+)  X->X+
+   2. R2 has all attributes in R, except for X+-X (i.e. keep X, left hand side attributes)
+
+For each Ri, compute functional dependency projections, check if they
+are in BCNF. If any of them is not in BCNF, apply BCNF decomposition
+recursively.
+
+Example:
+
+R(A,B,C,D,E,F), and F = {AB->C, C->DE, E->F}
+
+Key:AB  (C->DE and E->F violate BCNF)
+
+We will take C->DE out!
+C+ = {C,D,E,F}   C->CDEF
+
+R1(C,D,E,F)    F1={C->DE, E->F}  Key:C not in BCNF because E->F violates it
+
+R2(A,B,C)      F2={AB->C}  Key: AB, in BCNF 
+
+Decompose: 
+R1(C,D,E,F)    F1={C->DE, E->F}  Key:C not in BCNF because E->F violates it
+
+Take E->F out, E+ = {E,F}
+
+R11(E,F)   {E->F}  in BCNF
+R12(C,D,E)  {C->DE}  in BCNF
+
+Final result:
+
+(EF)
+(CDE)
+(ABC)
+
+----------------
+
+S(Showname, Startyear, Creator, StreamSite, URL, ShowSeasons, StreamSeasons)
+
+Showname -> StartYear, Creator, ShowSeasons 
+StreamSite -> URL
+URL -> StreamSite
+Showname StreamSite -> StreamSeasons   ok BCNF
+
+Key: ShowName, StreamSite
+
+Take out StreamSite->URL
+
+S1(StreamSite, URL)    {StreamSite->URL, URL->StreamSite}  in BCNF
+
+S2(Showname, Startyear, Creator, StreamSite, ShowSeasons, StreamSeasons)
+
+Showname -> StartYear, Creator, ShowSeasons 
+Showname StreamSite -> StreamSeasons     ok BCNF
+
+Key: ShowName, StreamSite
+
+
+Take out: Showname -> StartYear, Creator, ShowSeasons 
+
+S21(ShowName, StartYear, Creator, ShowSeasons)
+   Showname -> StartYear, Creator, ShowSeasons 
+
+S22(Showname, StreamSite, StreamSeasons)
+   Showname StreamSite -> StreamSeasons
+
+Final result:
+
+(ShowName, StartYear, Creator, ShowSeasons)
+   {Showname -> StartYear, Creator, ShowSeasons }
+
+(Showname, StreamSite, StreamSeasons)
+   {Showname StreamSite -> StreamSeasons}
+
+(StreamSite, URL)
+  {StreamSite->URL, URL->StreamSite}  
+
+
+------------------------------
+
+4NF
+-----------
+
+GameInfo(gameid, name, category, type)
+
+Games can have multiple categories and types
+
+gameid -> name
+Key: gameid, category, type
+
+Games(gameid, name)     gameid->name, key: gameid in BCNF
+
+GameInfo(gameid, category, type)   key: all attributes, in BCNF
+
+GameInfo is in BCNF, but it contains two multivalued attributes
+category and type.  But category and type are not coupled with each
+other. Hence, category and type are independeny of each other.
+
+A multivalued dependency of the form
+
+X =>> Y
+
+and suppose Z is the remainder of attributes in R.
+
+Says that whenever we have two tuples:   (x1,y1,z1), and (x1,y2,z2)
+
+then we must also have tuples:  (x1,y1,z2) and (x1,y2,z1)
+
+(Hence, Y and Z are independent of each other)
+
+If X=>Y and X and Y together is not all the attributes in R, then R is
+not in 4NF.
+
+(Alternatively, If X=>Y and X,Y is all the attributes in R, then R is in 4NF)
+
+If a relation is not in 4NF, use a method similar to BCNF
+decomposition to decompose, but now using multivalued dependencies.
+
+------------
+
+Example:
+
+GameInfo(gameid, category, type)   
+
+gameid =>> category,, since gameid and category together is not all
+the attributes, this relation is not in 4NF
+
+Take gameid=>> category out (no closure)
+
+GameInfo1(gameid, category)   gameid =>> category
+      Key: gameid, category  (4NF)
+
+GameInfo2(gameid, type)       gameid =>> type
+      Key: gameid, type      (4NF)
+
+
+--------------
+BCNF decomposition:
+
+R(A,B,C,D,E,F)  F={A->BC,C->D}   Key:AEF
+
+Take out C->D
+
+R1(C,D)  {C->D}  in BCNF
+
+R2(A,B,C,E,F)  {A->BC}  key: AEF
+
+Take out A->BC
+
+R21(A,B,C)   {A->BC}   Key: A
+R22(A,E,F)     {}        Key: AEF
+
+Final result:
+
+(C,D)  {C->D}  in BCNF
+(A,B,C)   {A->BC}   Key: A
+(A,E,F)     {}        Key: AEF
+
+
+===========
+
+(assuming we are not storing which actor appears in which location, just
+that movies have actors and locations)
+
+Movies(movieid, actor, location)
+
+movieid=>>actor
+
+Not in 4NF
+instead store:
+
+Movies1(movieid, actor)
+Movies2(movieid, location)

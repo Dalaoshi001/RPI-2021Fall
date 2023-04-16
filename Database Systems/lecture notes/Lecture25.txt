@@ -1,0 +1,49 @@
+Concurrnecy:
+
+Locking based mechanisms: deadlocks are possible.
+
+Resolving deadlocks:
+
+-> Avoid deadlocks
+-> Detect deadlocks and resolve them
+
+two phase locking(2PL): Lock with S lock for reading and X lock for writing
+and no new locks can be received after releasing one lock.
+
+Strict two phase locking (S2PL): Lock with S lock for reading and lock for 
+writing and hold all locks until commit, and then release all locks
+
+2PL and S2PL both guarantee serializability.
+
+Set transaction isolation levels:
+	SET ISOLATION LEVEL READ COMMITTED;
+	SET ISOLATION LEVEL REPEATABLE READ;
+	      -- Two phase locking guarantees this, but
+	      -- can still suffer from phantom updates for tuple based locks.
+	SET ISOLATION LEVEL SERIALIZABLE;
+
+What is being locked?
+	Table
+	Data Page
+	Tuple
+
+Suppose we are locking tuples.
+
+T1: select count(*) from R WHERE A = 5;
+      lock every tuple with a shared lock
+
+T2: insert into R(A) values(5,..);
+
+Since T1 locks all existing tuples, T2 is going to lead to an incorrect
+count and cna make the schedule non-serializable despite using 2PL.  --> phantom update problem
+
+Multi-level locks:
+
+IX -> intention to write some objects at levels below
+IS -> intention to read some objects at levels below
+
+S -> will read all nodes below this one
+X -> will write all nodes below this one
+
+Durability
+---------------

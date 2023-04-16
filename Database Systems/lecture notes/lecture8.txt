@@ -1,0 +1,68 @@
+
+Lecture 8
+===========
+
+Announcements
+----------------
+
+1. Exam is next week thursday, in class 2-4PM
+2. It is open notes and open books
+
+Design Decisions:
+-------------------
+
+Entity or attribute?
+
+Entity relationship diagrams - continued
+-----------------------------------------
+
+Students(RIN, fname, lname, email, address, gpa)
+Key: RIN
+
+Courses(CourseNo, abbr, name, credits)
+Key: CourseNo, Abbr
+
+Sections(crn, semester, year, capacity, courseno)
+Key: crn
+
+Rooms(id, number, building_abbr)
+Key: id
+
+Buildings(abbr, name, lat, long)
+Key: abbr
+
+Departments(code, name, mainoffice_roomid)
+key: code
+
+FacultyStaff(rin, fname, lname, address, position, email, department_code)
+Key: rin
+
+Majors(code, name)
+Key: code
+
+
+StudentMajors(rin, code) key: rin, code
+
+StudentSections(rin, crn, grade) key: rin, crn
+
+SectionRooms(crn, roomid) key: crn, roomid
+
+SectionInstructors(crn, rin, role) ket: crn, rin
+
+FacStaffRooms(roomid, rin, phoneno) key: roomid, rin
+
+Collaborates(rin1, rin2) key: rin, rin
+
+
+----
+
+Weak entites
+
+If rooms is represented as a weak entity
+
+
+FacStaffRooms(building_abbr, roomid, rin, phoneno) key: roomid, rin
+
+Departments(building_abbr, code, name, mainoffice_roomid)
+
+SectionRooms(crn, building_abbr, roomid) key: crn, roomid

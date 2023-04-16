@@ -1,0 +1,20 @@
+Yihang Wang
+Status Update
+Project Meetup
+
+This week:
+Given the test case in the database for front-end team to test. Add function in the
+appointment interface for users to check avaliable meeting time to meet. Find some
+bugs in time setting in the appointment interface and already fixed that. Take a discussion
+with our classmates about final presentation schedule. Prepare the final presentation schecule
+and start to check everyone's work finally.
+
+
+Next week:
+Preapre the presentation and enjoy Thanks Giving holiday!
+
+Block:
+There is currently no block there.
+
+link:
+https://github.com/ACertainScientific/MeetUp/commit/ef23c88af3258e4381c6bd389275b62898adec15

@@ -1,0 +1,263 @@
+
+Query Optimization
+-------------------
+
+Query optimization ->
+    1. Parse query and construct a relational algebra equivalent
+    2. Sanity check: logic and syntax check
+       (select * from r where a = 1 and a = 2;)
+
+    Enumerate many options for:
+        3. Construct a query tree from your query
+	4. Find an implementation for each operator
+        5. Find its expected cost (before running the query)
+
+    Choose the cheapest one!
+
+
+- Finding equivalent query trees
+
+Relational Algebra equivalences
+----------------------------------
+
+R join S = S join R
+R join (S join T) = (R join S) join T
+
+
+Pushing selections down a join:
+
+select_C( R  join S) = select_C(R) join select_C(S)
+
+If condition C only applies to R, then (***):
+
+select_C( R  join S) = select_C(R) join S
+
+Advantage: joins may be cheaper because we are joining fewer tuples
+that span fewer pages.
+
+Pushing projections down:
+
+project_A,B (R join S) = project_{A,B} (project_{A,B,C1} R) join (project_{A,B,C2} S)
+
+where C1 and C2 are attributes from R and S respectively that are
+needed for the join.
+
+Advantage: the size of tuples is reduced so more can be stored in the
+same amount of memory, and reduce the cost of joins (and other
+operations).
+
+- Finding expected size of output of different operations
+(before I run the query)
+
+Statistics to keep for each table:
+
+Number of tuples in the table  (TUPLES(R))
+
+For each attribute A in the table,
+
+VALUES(R.A): number of distinct values stored for R.A  (DISTINCT(R.A))
+MINVAL(R.A) MAXVAL(R.A) ->current min and max value stored for R.A
+
+(Assumption is each value for R.A is equally like and is distributed
+uniformly between min/max values)
+
+
+Equality query:
+     Selectivity(A=c) = 1/VALUES(A)
+
+Range query:
+     Selectivity(A>=c1 and A<c2) = (c2-c1)/(MAXVAL(A)-MINVAL(A))
+
+NOT query:
+     Sel (not C) = 1 - Sel(C)
+     
+AND query:
+     Sel(C1 and C2) = Sel(C1) * Sel(C2)
+
+OR query:
+     Sel(C1 OR C2) = Sel (not ((not C1) and (not C2)))
+                   = (1 - (1- sel(C1))*(1-sel(C2)))
+
+Join query:
+
+select * from r,s where r.a = s.b
+
+
+select * from r,s where r.a = c1  ->  1/values(R.A)
+select * from r,s where s.b = c2  ->  1/values(S.B)
+
+     Sel(R.A = S.B) = 1/max{values(R.A), values(S.B)}
+     Tuples = TUPLES(R) * TUPLES(S) * Sel(R.A=S.B)
+
+
+------------
+
+
+
+
+Table: Students(RIN, Class, Major, Age)
+
+Tuples(Students) = 8,000
+
+Values(RIN) = 8,000
+Values(Class) = 4
+Values(Major) = 40
+Values(Age) = 10   Minval(Age) = 15, Maxval(Age) = 32
+
+Table: Transcript(rin, crn, grade)
+
+Tuples(Transcript) = 200,000
+Values(RIN) =  7,695
+Values(CRN) =  300
+
+Q6: SELECT * FROM Students S, Transcript T WHERE S.rin = T.rin;
+
+Sel(S.rin = T.rin) =  1/{8000,7695}
+
+Tuples = 8000 * 200,000 * 1/8000 = 200,000
+
+
+Q1: select * from students where class = 'senior';
+
+Selectivity(C) = the percentage of tuples that are expected to pass
+condition C
+
+Tuples(Q) = Tuples(R)* Selectivity(C)
+
+Selectivity(class = 'senior') = 1/4
+
+
+Tuples(Q1) = 8,000 * 1/4 = 2,000
+
+Q2: select * from students where major = 'Math' ;
+
+Selectivity (major = 'Math') = 1/40
+Tuples(Q2) = 8,000 * 1/40 = 200 students
+
+Q2': select * from students where major = 'CSCI' ;
+
+Same expected values, but may be way off!
+
+
+Q0: select * from students where rin = 660012345
+
+Selectivity =1/8000
+Tuples = 8000 * 1/8000 = 1
+
+Q3: select * from students where age >= 18 and age < 21;
+
+Selectivity = 3/(32-15) = 3/17
+Tuples = 8,000 * 3/17
+
+Q3': select * from students where age >= 29 and age < 40;
+
+Selectivity = (32-29)/(32-15) = 3/17
+
+Q4: select * from students where major = 'CSCI' and class = 'senior';
+
+sel = 1/40 * 1/4
+
+tuples = 8000/160 
+
+Q5: select * from students where age = 18 and class = 'senior';
+
+
+- Enumerate all possible implementations
+
+---> Find all possible two-way joins   (if joining R,S,T,W)
+
+R,S
+R,T
+S,T
+R,W
+S,W
+T,W
+
+
+Find cheapest ways to implement the join + keep a number
+of interesting query plans with the two relations that may provide
+cheaper plans later
+
+-> Take each 2-way join and add a third relation to join
+
+(R,S) + T
+(R,T) + W
+...
+
+Prune options that are too expensive.
+
+Continue adding joins until the whole query is implemented, and choose
+the cheapest.
+
+
+
+
+
+
+-------------------------------------------
+
+PAGES(R) = 100,  TUPLES(R) = 20,000
+PAGES(S) = 500,  TUPLES(S) = 200,000
+
+Suppose each attribute is 4 bytes long.
+VALUES(R.A)= 1,000
+VALUES(R.E)= 2,000
+VALUES(S.F)= 1,800
+VALUES(R.B)= 400
+VALUES(R.C)= 5,000 between 0 (minval) - 10,000 (maxval)
+
+SELECT
+   R.D
+FROM
+   R
+WHERE
+   R.A = 5
+   AND R.B in ('a','b')
+   AND R.C <= 100 AND R.C > 500 ;
+
+Sel( R.A = 5) = 1/1000
+Sel (R.B in ('a','b')) = 1- (1-1/400)*(1-1/400)
+Sel( R.C <= 100 AND R.C > 500) = 400/10000
+
+Sel (Query) = 1/1000 * (1- (1-1/400)*(1-1/400)) * (400/10000)
+
+
+SELECT
+   R.D, S.G, count(*)
+FROM
+   R,S
+WHERE
+   R.E = S.F
+   AND R.A = 5
+GROUP BY
+   R.D, S.G ;
+
+Sel(R.E=S.F) = 1/max{2000,1800} = 1/2000
+Sel(R.A) = 1/1000
+
+Sel = 1/1000 * 1/2000
+Tuples = 20,000 * 200,000 * 1/1000 * 1/2000
+
+
+
+
+
+
+
+
+
+
+
+-------
+
+
+select
+   avg_width
+   , histogram_bounds
+from
+   pg_stats
+where
+   tablename = 'songs'
+   and attname = 'decade';
+
+

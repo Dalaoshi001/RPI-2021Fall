@@ -1,0 +1,303 @@
+
+
+Lecture 13
+-------------
+
+Option 1:
+
+Query -> use in from Statement like a relation (anonymous relations)
+
+from (---- query ----) as x
+
+where x.
+
+
+Option 2:
+
+Query that returns a single value -> use anywhere instead of a number
+(Scalar queries)
+
+
+select a,b,c, (---- scalar query---)
+...
+where 5 = (---- scalar query --- )
+
+Option 2:
+
+Query that returns a set/bag of tuples
+
+Check values against the set
+
+value in (=== query ---)
+value not in (=== query ---)
+value >=ALL (=== query ---)   (>=, >, =, <, <=, <>)
+value >=ANY (=== query ---)   (>=, >, =, <, <=, <>)
+
+
+exists (---- query ----) - true if the result of the query is a non-empty set/bag
+
+not exists (---- query ----) - true if the result of the query is an empty set/bag
+
+------------
+
+
+Find episodes in which no one has been eliminated.
+
+
+select id from episodes
+except
+select episodeid from results where result='eliminated';
+
+
+select
+   id
+from
+   episodes e
+   left join results r
+   on e.id=r.episodeid and r.result='eliminated'
+where
+   r.episodeid is null ;
+
+
+select
+   id
+from
+   episodes 
+where
+   id not in (set of episodeids in which someone was eliminated) ;
+
+
+select
+   id
+from
+   episodes 
+where
+   id not in (select episodeid from results where result='eliminated') ;
+
+
+Find episodes with the highest number of eliminations.
+
+select
+   episodeid
+from
+   results
+where
+   result='eliminated'
+group by 
+   episodeid
+having
+   count(*) = (max number of eliminations in any episode) ;
+
+
+-- This query returns number of eliminations per episode
+
+select
+   count(*) 
+from
+   results
+where
+   result='eliminated'
+group by 
+   episodeid ;
+
+
+select
+   episodeid
+from
+   results
+where
+   result='eliminated'
+group by 
+   episodeid
+having
+   count(*) >= ALL (select
+                      count(*) 
+                    from
+                       results
+                   where
+                      result='eliminated'
+                   group by 
+                       episodeid ) ;
+
+
+
+
+Find bakers who ranked 1 in technicals the highest number of times.
+
+-- solve in the same way as the query above!
+
+
+
+Find bakers who got a rank 1 in technicals in an episode and then
+never won star baker after that episode.
+
+
+select
+   t.baker
+from
+   technicals t
+where
+   t. rank = 1
+   and t.episodeid > ALL (all episodes this person got a star baker) ;
+
+
+select DISTINCT
+   t.baker
+from
+   technicals t
+where
+   t. rank = 1
+   and NOT EXISTS (SELECT r.episodeid
+                   FROM results r
+                   WHERE r.result = 'star baker'
+		         and t.baker = r.baker
+			 and t.episodeid < r.episodeid) ;
+
+
+Episodes in which no one is eliminated:
+
+select
+   e.id
+from
+   episodes e
+where
+   not exists (select r.episodeid
+               from results r
+	       where r.result='eliminated'
+	             and r.episodeid = e.id) ;
+
+Return for each contestant the last episode in which they won rank 1
+in technicals.
+
+select
+    t.baker
+    , t.episodeid
+from
+    technicals t
+where
+    t.rank = 1
+    and not exists (select 1
+                    from technicals t2
+		    where t2.rank = 1
+		          and t2.baker = t.baker
+			  and t2.episodeid > t.episodeid);
+
+TRANSACTIONS
+---------------
+
+A sequence of operations that change data
+
+
+begin ;
+-- sql operations that query or change data ;
+
+end ;
+
+Atomicity: a transaction either executes fully or not at all.
+
+If xact succeeds: commit -> make changes permanent!
+
+If xact fails: rollback -> all changes made by the transaction are erased!
+
+
+-----------------
+
+DROP TABLE IF EXISTS tmp ;
+
+CREATE TABLE tmp (
+     id      INT PRIMARY KEY
+     , name  VARCHAR(10)  NOT NULL
+     , val   VARCHAR(10)
+) ;
+
+INSERT INTO tmp VALUES(2, 'ABC', 'val1') ;
+
+INSERT INTO tmp(id,name) VALUES(3, 'DEF') ;
+
+----------
+
+Insert the results of a query into another relation ;
+
+INSERT INTO tmp SELECT .... FROM ... WHERE ...;
+
+
+create table stats (baker varchar(20), numwins int) ;
+
+
+insert into stats
+select
+   r.baker, count(distinct t.episodeid) + count(distinct r.episodeid) as numwins
+from
+   results r
+   full join technicals t on r.baker = t.baker
+                             and t.rank = 1
+                             and r.result = 'star baker'
+where
+    r.baker is not null
+group by
+   r.baker
+;
+
+
+
+
+
+DELETE
+
+delete from relation
+where condition ;
+
+Deletes all tuples that satisfy the condition in the WHERE clause;
+
+delete from stats where numwins = 1;
+
+delete from stats ;  -- deletes all the tuples
+
+
+Delete all tuples from stats for bakers who never won star baker
+
+delete from stats
+where baker not in (select baker from results where result = 'star baker') ;
+
+
+UPDATE
+--------
+
+update relation
+set attribute = X, attribute2 = Y
+where condition ;
+
+For those tuples that satisfy the WHERE condition
+change the value of attributes in SET
+
+UPDATE stats
+SET numwins = numwins + 1
+WHERE baker like 'R%' ;
+
+
+Update stats, add 1 to numwins for people who got rank 1 in technicals
+more than once.
+
+UPDATE stats
+SET numwins = numwins + 1
+WHERE baker IN (
+   SELECT
+      baker
+   FROM
+      technicals
+   WHERE
+      rank = 1
+   GROUP BY
+      baker
+   HAVING
+      count(*)> 1) ;
+
+
+DELETE FROM stats ;
+
+INSERT INTO stats SELECT baker, 0 FROM bakers ;
+
+UPDATE stats
+SET numwins = (SELECT count(*) FROM results r
+               WHERE r.result = 'star baker' and r.baker = stats.baker)
+;

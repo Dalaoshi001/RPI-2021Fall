@@ -1,0 +1,316 @@
+
+
+=========================================================================
+PLEASE DO NOT CREATE THE FUNCTIONS HERE OR ANY OBJECTS IN THE SHARED
+DATABASES IN THE CLASS SERVER.
+
+USE YOUR OWN DATABASE.
+
+LOOK AT THE LEFT DROPDOWN FOR DATABASES AND CHOOSE: db_<yourusername>
+=========================================================================
+
+
+
+PL/pgSQL:
+
+Documentation here:
+
+https://www.postgresql.org/docs/13/plpgsql.html
+
+Disclaimer: not all functions I write here are things that are good ideas!
+<don't use all of these, they are just examples.>
+
+Basic structure:
+-------------------------------------
+
+CREATE FUNCTION functionname(variable type) RETURNS type AS $$
+DECLARE
+   varname type ;
+BEGIN
+   <body>
+   RETURN value ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+--------------------------------------
+
+Data types:
+
+user_id integer;
+quantity numeric(5);
+url varchar;
+myrow tablename%ROWTYPE;
+myfield tablename.columnname%TYPE;
+arow RECORD;
+
+
+
+
+
+DROP FUNCTION epsum(int, date, varchar) ;
+
+CREATE OR REPLACE FUNCTION epsum(id int, epdate date, name varchar)
+          RETURNS varchar AS $$
+DECLARE
+   sumdata varchar ;
+BEGIN
+   sumdata = 'Episode: ' || id::varchar || ' titled "' || name || '" took place on ' || cast(epdate as varchar)  ;
+   RETURN sumdata ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+SELECT title, epsum(id, firstaired, title) from episodes ;
+
+
+
+
+
+----------------
+
+Queries that return a single tuple:
+
+DROP FUNCTION epsum2 (int);
+CREATE OR REPLACE FUNCTION epsum2(inputepid int) RETURNS varchar AS $$
+DECLARE
+   sumdata varchar ;
+   epdate date ;
+   eptitle varchar ;
+BEGIN
+   SELECT firstaired, title INTO epdate, eptitle
+   FROM episodes where id = inputepid ;
+
+   sumdata = 'Episode: ' || inputepid::varchar || ' titled "' || eptitle || '" took place on ' || cast(epdate as varchar)  ;
+   RETURN sumdata ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+CREATE OR REPLACE FUNCTION epsum2(inputepid int) RETURNS varchar AS $$
+DECLARE
+   sumdata varchar ;
+   myrow RECORD ;
+BEGIN
+   SELECT firstaired, title INTO myrow
+   FROM episodes where id = inputepid ;
+
+   sumdata = 'Episode: ' || inputepid::varchar || ' titled "' || myrow.title || '" took place on ' || cast(myrow.firstaired as varchar)  ;
+   RETURN sumdata ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+
+
+
+baking=> select epsum2(4) ;
+
+
+DROP FUNCTION epsum3 (int);
+CREATE OR REPLACE FUNCTION epsum3(inputepid int) RETURNS varchar AS $$
+DECLARE
+   sumdata varchar ;
+   myrow RECORD ;
+BEGIN
+   SELECT firstaired, title INTO myrow
+   FROM episodes where id = inputepid ;
+
+   sumdata = 'Episode: ' || inputepid::varchar || ' titled "' || myrow.title || '" took place on ' || cast(myrow.firstaired as varchar)  ;
+   RETURN sumdata ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+
+
+----------------
+
+Queries that return more than one tuple:
+
+DROP FUNCTION bakerinfo(varchar);
+
+
+CREATE OR REPLACE FUNCTION bakerinfo(inputbaker varchar) RETURNS varchar AS $$
+DECLARE
+   myrow RECORD;
+   summary VARCHAR ;
+BEGIN
+   summary = 'Baker ' || inputbaker || ' was star baker in: ';
+   FOR myrow IN SELECT episodeid FROM results
+       WHERE result = 'star baker' AND lower(baker) = lower(inputbaker)
+   LOOP
+       summary = summary || myrow.episodeid::varchar || ' ';
+   END LOOP;
+   summary = trim(summary) || ' and favorite in: ' ;
+   FOR myrow IN SELECT episodeid FROM favorites
+       WHERE lower(baker) = lower(inputbaker)
+   LOOP
+       summary = summary || myrow.episodeid::varchar || ' ';
+   END LOOP;
+   summary = trim(summary) || '.' || E'\n' || 'Won technical in: ' ;
+   FOR myrow IN SELECT episodeid FROM technicals
+       WHERE rank = 1 AND lower(baker) = lower(inputbaker)
+   LOOP
+       summary = summary || myrow.episodeid::varchar || ' ';
+   END LOOP;
+   summary = trim(summary) || '.' || E'\n' || 'Eliminated in: ' ;
+   FOR myrow IN SELECT episodeid FROM results
+       WHERE result = 'eliminated' AND lower(baker) = lower(inputbaker)
+   LOOP
+       summary = summary || myrow.episodeid::varchar ;
+   END LOOP;
+   
+   RETURN summary || '.';
+END ;
+$$ LANGUAGE plpgsql ;
+
+select baker, bakerinfo(baker) from bakers;
+select bakerinfo('Dan');
+
+
+----------------
+
+Queries that are run many times: cursors
+
+DROP FUNCTION youngerbakers();
+CREATE OR REPLACE FUNCTION youngerbakers() RETURNS VARCHAR AS $$
+DECLARE
+   bakerval VARCHAR;
+   curs1 CURSOR FOR SELECT b.fullname
+                    FROM bakers b, bakers b2
+                    WHERE b.age < b2.age AND b2.baker = bakerval
+		    ORDER BY b.fullname ASC;
+   myrow RECORD ;
+   myrow2 RECORD ;
+   summary VARCHAR ;
+BEGIN
+   summary = '' ;
+   FOR myrow IN SELECT baker, fullname FROM bakers ORDER BY age DESC
+   LOOP
+      summary = summary || 'baker: ' || myrow.fullname ;
+      summary = summary || E'\n' || 'Younger bakers: ' ;
+
+      bakerval = myrow.baker;
+      FOR myrow2 IN curs1 LOOP
+         summary = summary || myrow2.fullname || E' ';
+      END LOOP ;
+      summary = summary || E'\n' ;
+   END LOOP ;
+   RETURN summary ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+
+
+-------------------------
+
+Queries that return more than one tuple, i.e. a relation!
+
+
+DROP TABLE IF EXISTS younger;
+
+CREATE TABLE younger (baker1 varchar(10), baker2 varchar(10));
+
+CREATE OR REPLACE FUNCTION youngerbakers2() RETURNS SETOF younger  AS $$
+DECLARE
+   bakerval VARCHAR;
+   myrow RECORD ;
+   returnrow younger%rowtype;
+BEGIN
+   FOR myrow IN
+       SELECT b1.baker as baker1, b2.baker as baker2
+       FROM bakers b1, bakers b2
+       WHERE b1.age < b2.age 
+   LOOP
+      returnrow.baker1 = myrow.baker1;
+      returnrow.baker2 = myrow.baker2;
+      RETURN NEXT returnrow;
+   END LOOP ;
+   RETURN ;
+END ;
+$$ LANGUAGE plpgsql ;
+
+select b1.*,b.fullname from youngerbakers2() as b1, bakers b where b1.baker1=b.baker ;
+
+select * from youngerbakers2() ;
+
+select youngerbakers2() ;
+
+
+---------------------
+
+Procedures (that do not return anything, a newer addition to pl/pgsql):
+
+CREATE OR REPLACE PROCEDURE test1()
+AS $$
+BEGIN
+    CREATE TABLE summary AS SELECT baker, count(*) as count
+                       FROM technicals WHERE rank=1
+		       GROUP BY baker ;
+
+    COMMIT;
+END;
+$$ LANGUAGE plpgsql ;
+
+-------------------
+
+Triggers:
+------------
+
+Constraint management:
+
+- Trigger is triggered when a certain event occurs
+     insert/update/delete from specific tables
+
+- There can be additional conditions (WHEN statement)
+
+- Trigger body tells you what to do
+
+-  NEW is the new value of a tuple
+   OLD is the old value of the tuple
+
+Updates have new and old both
+Deletes only have old values
+Inserts only have new values
+
+
+CREATE FUNCTION fix_favorites () RETURNS trigger AS $$
+    BEGIN
+        IF NEW.result = 'star baker' THEN
+	   DELETE FROM favorites
+	   WHERE baker = NEW.baker AND episodeid = NEW.episodeid ;
+	END IF ;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER fix_favorites AFTER INSERT OR UPDATE ON results
+    FOR EACH ROW EXECUTE FUNCTION fix_favorites();
+
+
+
+
+
+CREATE FUNCTION fix_episodes () RETURNS trigger AS $$
+    BEGIN
+        IF NEW.viewers7day-OLD.viewers7day > 5 THEN
+             NEW.viewers7day = OLD.viewers7day;
+	END IF ;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER episode_trigger BEFORE UPDATE ON episodes
+    FOR EACH ROW EXECUTE FUNCTION fix_episodes();
+
+
+---------
+
+
+Frameworks:
+
+Django
+Flask
+Ruby on Rails
+.NET
+WebObjects
+Spring
+Grails
+
+

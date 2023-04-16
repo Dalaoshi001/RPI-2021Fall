@@ -1,0 +1,146 @@
+
+Class FAQ:
+------------
+
+. What will be covered in this class? How is the content organized?
+
+Data modeling
+Data management, SQL
+Database internals
+
+. What do I need to know in advance?
+
+FoCs, DS, OpSys
+
+. Do I need to install a database management system on my computer?
+
+
+. What else might be good for me to learn?
+
+
+
+Introduction to Relational Databases
+Textbook, Chapter 1
+--------------------------------------
+
+
+Database
+Relational Database
+
+
+Components of DBMS
+
+
+. Data model: rules about your data
+. Database: data model + actual data objects
+
+DBMS: Database Management System
+
+- Postgresql
+- MariaDB
+- MySQL
+- Oracle
+- SQLLite
+- IBM DB2
+- Informix
+- Access
+- Sqlserver
+
+
+- MangoDB
+- Excel?
+- DynamoDB?
+- GraphQL
+- Google Firebase
+
+
+DBMS components:
+
+- Storage manager
+- Query and data manipulation language
+- Transaction manager
+
+    Atomic  - 
+    Consistency
+    Isolation
+    Durability
+
+
+Types of databases:
+
+- Relational databases  ****
+- Hierarchical databases
+- Object oriented databases
+- Graph databases
+- Relational databases + object relational extensions
+
+
+
+
+
+A relational database
+-------------------------
+
+Database = a set of relations
+
+Data model: 
+
+Each relation has a set of attributes
+
+Each attribute has a domain: a set of valid values
+
+~~~~~~~~~~~~~~~
+
+Database: SIS
+
+Relations: Students, Courses, Classes, Grades, FinancialInfo, Faculty
+
+Attributes:
+
+    Classes: Section, Course Code, Subject Code, CRN, Classroom, MaxEnrollment, Format, Semester, Year
+    
+    Students: First, Middle, Last, Pronouns, Preferred Name, RIN, SSN, Address, email, flex balance
+
+Domain of an attribute: set of valid values:
+
+Course Code: 4 digit code, Subject Code: 4 letters, CRN:5 digits
+RIN: 9 digits start with 66
+
+A database is a set of relations.
+
+A database instance is a set of tuples in each relation such that each
+tuple satisfy the data model rules.
+
+Relations -------  Tables
+Attributes  ------ Columns
+Tuples    -------- Rows
+
+--------------
+
+Rule 1: A relation instance is a set of tuples. [[tuples are not repeated!]]
+
+{1,1,2,3,4} == {1,2,3,4} == {2,3,4,1}
+
+
+Rule 2: All attributes are simple, contain flat, atomic values.
+
+
+Key of a relation: A key for a relation is a minimal set of attributes
+such that no two tuples can have the same values for the key.
+
+Students: First, Middle, Last, Pronouns, Preferred Name, RIN, SSN,
+          Address, email, flex balance
+
+          Key: RIN
+	  Key: Email
+	  Key: SSN
+
+Classes: Section, Course Code, Subject Code, CRN, Classroom,
+         MaxEnrollment, Format, Semester, Year
+    
+         Key: CRN
+	 Key: Section, Course Code, Subject Code, Semester, Year
+
+
+StudentHobbies(CRN, Hobby)
+         Key: CRN, Hobby

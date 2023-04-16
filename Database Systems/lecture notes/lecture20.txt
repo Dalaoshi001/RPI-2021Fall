@@ -1,0 +1,50 @@
+Secondary storage continued!
+---------------------------------
+
+create index playedonradio1_idx on playedonradio(station, songid);
+
+select songid from playedonradio where station = 'mai';
+
+select station from playedonradio where songid = 1234;
+
+B-trees are super useful
+-------------------------------
+
+Index on R(X, Y) can be used for many types of searches (to different
+levels of effectiveness)
+
+effectiveness = how much of the leaf level do I need to scan
+
+X=1 and Y=5 or X=1 and Y>5 and Y <= 10 
+X = 1 or X >= 1 and X <= 4
+
+X >= 1 and X <= 4 and Y = 2 (Y condition is mostly irrelevant)
+
+Y=2 (Y condition is irrelevant, scan the whole index)
+
+
+But wait, are there other types of indices?
+-----------------------------------------------------
+
+R-tree (points, any geometric object)
+	balanced tree
+	Postgresql -> GIST trees
+
+Unbalanced trees -> Quadtrees and k-d trees
+	Postgresql -> Sp-GIST trees
+
+---------------
+Secondary Index     vs.             Primary Index
+================================
+
+select * from playedonradio where station = 'mai';
+
+Secondary indices do not change how the relation is stored on disk
+Just creates loop up structures
+
+Primary indices change how to store the data
+
+Hashing is a way to create a primary index
+
+only for equality search
+
